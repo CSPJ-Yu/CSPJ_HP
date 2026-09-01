@@ -1,0 +1,5 @@
+event_id,dj_id,date,event_name,venue,location,type,status,flyer_url,memo
+s001,sample,2026-09-12,,SAMPLE HALL,"Shibuya, Tokyo",CLUB,active,,No flyer_url — FLYERボタンが出ないことの確認用
+s002,sample,2026-10-03,SAMPLE MUSIC FESTIVAL,SAMPLE FESTIVAL GROUNDS,"Sample City",FESTIVAL,active,https://picsum.photos/id/1015/1000/1400,"非Drive形式の直リンク画像URL — そのまま表示できることの確認用"
+s003,sample,2026-11-20,,SAMPLE LOUNGE,"Roppongi, Tokyo",SPECIAL,active,https://drive.google.com/file/d/1a2B3c4D5e6F7g8H9i0J_sampleonly/view,"実在しないDrive ID — 画像読み込み失敗→外部リンクへのフォールバック確認用"
+s000,sample,2026-08-01,PAST SAMPLE EVENT,OLD SAMPLE VENUE,"Tokyo",CLUB,past,,"status=past のため一覧に表示されないことを確認するための行"

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="【技術サンプル】DJ SAMPLE — CSPJが制作するDJ個別サイトの構造確認用サンプルページです。実在のアーティストではありません。">
+  <title>DJ SAMPLE — Technical Sample Site</title>
+
+  <!--
+    このページは /dj/sample/ 配下で完結する完全独立サイトです。
+    CSPJ本体の /css/style.css / /js/main.js、および /dj/style.css は
+    一切読み込みません。フォント・配色・レイアウト・JSはすべてこのディレクトリ内で完結します。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!--
+    CSPJ共通のスケジュール取得モジュール（データ取得のみ・HTML/CSSは含まない）。
+    詳細は /dj/README.md および /dj/shared/js/schedule-data.js を参照。
+  -->
+  <script src="/dj/shared/js/schedule-data.js"></script>
+</head>
+<body>
+
+  <div class="sample-badge">SAMPLE PAGE — 技術検証用のダミーページです</div>
+
+  <header class="site-header" id="top">
+    <div class="site-header__inner">
+      <a href="#top" class="brand">DJ<span>SAMPLE</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="#profile">Profile</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__inner">
+        <p class="hero__eyebrow">Connect Spread PJ Presents</p>
+        <h1 class="hero__title">DJ<br>SAMPLE</h1>
+        <p class="hero__tagline">This is a placeholder tagline for the sample artist page.</p>
+        <a href="#profile" class="hero__cta">Scroll ↓</a>
+      </div>
+    </section>
+
+    <section id="profile" class="profile">
+      <div class="wrap">
+        <h2 class="section-title"><span>01</span>Profile</h2>
+        <div class="profile__grid">
+          <div class="profile__photo" aria-hidden="true"><span>PHOTO</span></div>
+          <div class="profile__text">
+            <p>
+              これはサンプルのプロフィール文章です。実在のDJの情報ではありません。
+              このセクションでは、活動歴・得意ジャンル・出演実績などを自由なレイアウトで記載できます。
+            </p>
+            <ul class="profile__tags">
+              <li>Genre: Sample</li>
+              <li>Base: Tokyo (placeholder)</li>
+              <li>Since: 20XX (placeholder)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="schedule" class="schedule">
+      <div class="wrap">
+        <h2 class="section-title"><span>02</span>Schedule</h2>
+        <ul class="schedule__list">
+          <li class="schedule__item">
+            <span class="schedule__date">20XX.XX.XX</span>
+            <span class="schedule__venue">Sample Venue / Tokyo</span>
+            <span class="schedule__tag">Placeholder</span>
+          </li>
+          <li class="schedule__item">
+            <span class="schedule__date">20XX.XX.XX</span>
+            <span class="schedule__venue">Sample Festival</span>
+            <span class="schedule__tag">Placeholder</span>
+          </li>
+          <li class="schedule__item">
+            <span class="schedule__date">20XX.XX.XX</span>
+            <span class="schedule__venue">Sample Club Night</span>
+            <span class="schedule__tag">Placeholder</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="gallery" class="gallery">
+      <div class="wrap">
+        <h2 class="section-title"><span>03</span>Gallery</h2>
+        <div class="gallery__grid">
+          <div class="gallery__item gallery__item--1"><span>SAMPLE</span></div>
+          <div class="gallery__item gallery__item--2"><span>SAMPLE</span></div>
+          <div class="gallery__item gallery__item--3"><span>SAMPLE</span></div>
+          <div class="gallery__item gallery__item--4"><span>SAMPLE</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="socials">
+      <div class="wrap">
+        <h2 class="section-title"><span>04</span>Contact / SNS</h2>
+        <div class="socials__grid">
+          <a href="#" class="socials__link" aria-label="Instagram (placeholder)">Instagram</a>
+          <a href="#" class="socials__link" aria-label="X / Twitter (placeholder)">X (Twitter)</a>
+          <a href="#" class="socials__link" aria-label="SoundCloud (placeholder)">SoundCloud</a>
+          <a href="#" class="socials__link" aria-label="Booking Contact (placeholder)">Booking</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>This is a technical sample page produced for Connect Spread PJ (CSPJ). Not a real artist site.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
