@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cspj-site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8791"],
+      "port": 8791
+    },
+    {
+      "name": "cspj-site-alt",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8792"],
+      "port": 8792
+    },
+    {
+      "name": "cspj-manage",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["wrangler", "dev", "--port", "8793"],
+      "port": 8793
+    }
+  ]
+}

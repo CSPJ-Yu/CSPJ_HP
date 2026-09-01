@@ -1,0 +1,14 @@
+# DJ portal / artist sites are managed separately and intentionally
+# excluded from this repo's pushes for now. Remove this line (and
+# `git add dj/`) once you're ready to publish it alongside the main site.
+/dj/
+
+# Separate "manage-cspj-hp" (manage.cs-pj.com) Wrangler project that
+# happens to live in this same folder. Unrelated to the CSPJ main site —
+# not included in this repo. Consider giving it its own repository.
+/node_modules/
+/.wrangler/
+/public/
+/package.json
+/package-lock.json
+/wrangler.jsonc
