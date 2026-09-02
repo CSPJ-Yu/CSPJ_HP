@@ -1,9 +1,29 @@
-# Separate "manage-cspj-hp" (manage.cs-pj.com) Wrangler project that
-# happens to live in this same folder. Already tracked in its own
-# independent repository — not included here.
-/node_modules/
-/.wrangler/
-/public/
-/package.json
-/package-lock.json
-/wrangler.jsonc
+# CSPJ 公開サイト(cs-pj.com)専用リポジトリ .gitignore
+# このプロジェクトは静的HTML/CSS/JSのみで、ビルド・npm・Cloudflare Workers/Pages Functions
+# は不要です。以下は誤ってこのリポジトリに紛れ込ませないための保険的な除外設定です。
+
+# 秘密情報
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+*.pem
+*.key
+
+# Node.js / npm(このリポジトリでは本来不要)
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Cloudflare Wrangler のローカルキャッシュ・一時ファイル(このリポジトリでは本来不要)
+.wrangler/
+.mf/
+
+# OS / エディタの一時ファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/
