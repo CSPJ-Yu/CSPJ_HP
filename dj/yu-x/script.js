@@ -199,3 +199,96 @@
       });
   };
 })();
+
+/* ============================================================
+   NEWS — 現時点では公開APIに接続していない(土台のみ)。
+   .news__list (data-news-list) に「Coming Soon」を静的表示しているだけで、
+   動的な初期化処理は無い。将来ここに initNews() を追加し、
+   { title, body, image(任意), published_at } の配列を取得して
+   .news__item / .news__item--with-image を描画する想定
+   (SCHEDULE以外のAPI URLを推測実装しないという方針のため、今回は未実装)。
+   ============================================================ */
+
+/* ============================================================
+   SNS LINKS — 現時点では公開APIに接続していない(土台のみ)。
+   .social__list (data-social-list) に「Coming Soon」を静的表示しているだけ。
+   将来ここに initSocialLinks() を追加し、{ platform, url, enabled } の配列から
+   enabled=true の項目だけを .social__link として描画する想定
+   (架空のURLは今回設定していない)。
+   ============================================================ */
+
+/* ============================================================
+   Popup — 将来のAPI接続に備えた最小限の土台。Flyer Modalとは
+   DOM・クラス名・実装を完全に分離している(用途が異なるため)。
+
+   今回はAPI未接続のため、ページ読み込み時に自動的に開くことはない。
+   表示条件・頻度制御(Cookie等による「1日1回だけ表示」等)も今回は対象外。
+   将来、POPUP用の公開APIから取得したデータをそのまま
+   window.CSPJPopup.open({ title, body, image }) に渡せば表示できる。
+   ============================================================ */
+(function initPopup() {
+  let modal = null;
+  let lastFocused = null;
+
+  function ensureModal() {
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.className = 'popup-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'popup-modal-title');
+    modal.setAttribute('aria-describedby', 'popup-modal-body');
+    modal.innerHTML = `
+      <div class="popup-modal__inner">
+        <button type="button" class="popup-modal__close" aria-label="閉じる">✕</button>
+        <img class="popup-modal__img" alt="" style="display:none;">
+        <h2 class="popup-modal__title" id="popup-modal-title"></h2>
+        <p class="popup-modal__body" id="popup-modal-body"></p>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('.popup-modal__close').addEventListener('click', closePopup);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closePopup(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) closePopup();
+    });
+
+    return modal;
+  }
+
+  function closePopup() {
+    if (!modal || !modal.classList.contains('is-open')) return;
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+  }
+
+  // data: { title, body, image(任意) }。textContentで挿入するためHTMLエスケープ不要。
+  function openPopup(data) {
+    const m = ensureModal();
+    const titleEl = m.querySelector('.popup-modal__title');
+    const bodyEl = m.querySelector('.popup-modal__body');
+    const imgEl = m.querySelector('.popup-modal__img');
+
+    titleEl.textContent = (data && data.title) || '';
+    bodyEl.textContent = (data && data.body) || '';
+
+    if (data && data.image) {
+      imgEl.src = data.image;
+      imgEl.style.display = 'block';
+    } else {
+      imgEl.removeAttribute('src');
+      imgEl.style.display = 'none';
+    }
+
+    lastFocused = document.activeElement;
+    m.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    m.querySelector('.popup-modal__close').focus();
+  }
+
+  // 将来のAPI接続処理から呼び出せるよう公開する。今回はどこからも自動的に
+  // 呼び出さない(手動 `CSPJPopup.open({...})` でのみ開ける状態)。
+  window.CSPJPopup = { open: openPopup, close: closePopup };
+})();

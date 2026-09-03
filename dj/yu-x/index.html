@@ -26,12 +26,16 @@
     CSPJ共通のデータ取得モジュール(データ取得のみ・HTML/CSSは含まない)。
     読み込み順に注意: utils.js → api-client.js → schedule-data.js
     詳細は /dj/README.md の「9. 公開API移行方針」を参照。
+    現時点でAPI接続しているのはSCHEDULEのみ(NEWS/SNS/POPUPは土台のみ)。
   -->
   <script src="/dj/shared/js/utils.js"></script>
   <script src="/dj/shared/js/api-client.js"></script>
   <script src="/dj/shared/js/schedule-data.js"></script>
 </head>
 <body>
+
+  <!-- キーボード操作者向けのスキップリンク。通常時は非表示、フォーカス時のみ表示。 -->
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
 
   <header class="site-header" id="top">
     <div class="site-header__inner">
@@ -41,12 +45,13 @@
       </button>
       <nav class="site-nav" id="siteNav">
         <a href="#profile">Profile</a>
+        <a href="#news">News</a>
         <a href="#schedule">Schedule</a>
       </nav>
     </div>
   </header>
 
-  <main>
+  <main id="main-content" tabindex="-1">
     <section class="hero">
       <div class="hero__inner">
         <p class="hero__eyebrow">Connect Spread PJ Presents</p>
@@ -57,9 +62,11 @@
       </div>
     </section>
 
-    <section id="profile" class="profile">
+    <section id="profile" aria-labelledby="profile-heading">
       <div class="wrap">
-        <h2 class="section-title"><span>01</span>Profile</h2>
+        <h2 class="section-title" id="profile-heading">
+          <span aria-hidden="true">01</span>Profile
+        </h2>
         <div class="profile__grid">
           <!-- TODO(CSPJ): プロフィール写真が届き次第、この枠に <img> を差し込む -->
           <div class="profile__photo" aria-hidden="true"><span>PHOTO</span></div>
@@ -72,9 +79,32 @@
       </div>
     </section>
 
-    <section id="schedule" class="schedule">
+    <section id="news" aria-labelledby="news-heading">
       <div class="wrap">
-        <h2 class="section-title"><span>02</span>Schedule</h2>
+        <h2 class="section-title" id="news-heading">
+          <span aria-hidden="true">02</span>News
+        </h2>
+        <!--
+          NEWS一覧はまだ公開APIに接続していない(土台のみ)。
+          将来のデータ形状: { title, body, image(任意), published_at }
+          画像あり/なし両方のitemに対応できるよう、.news__item--with-image を
+          任意で付与する想定(下記CSS参照)。
+
+          将来JSからNEWS一覧を差し込むコンテナは data-news-list で明示。
+          現時点ではinitNews()等のAPI接続処理は実装していない
+          (SCHEDULE以外のAPI URLを推測実装しないという方針のため)。
+        -->
+        <div class="news__list" data-news-list>
+          <p class="news__placeholder">Coming Soon</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="schedule" aria-labelledby="schedule-heading">
+      <div class="wrap">
+        <h2 class="section-title" id="schedule-heading">
+          <span aria-hidden="true">03</span>Schedule
+        </h2>
         <!--
           初期表示は静的なプレースホルダー。JSでAPI取得に成功した場合のみ
           .schedule__list の中身を実データで置き換える。取得に失敗した場合は
@@ -86,6 +116,22 @@
       </div>
     </section>
   </main>
+
+  <!--
+    SNS LINKS: ページ下部のリンク領域として扱い、メインナビゲーションには含めない。
+    まだ公開APIに接続していない(土台のみ)。
+    将来のデータ形状: { platform, url, enabled } の配列。enabled=trueの項目だけ描画する。
+    想定プラットフォーム: Instagram / X / TikTok / YouTube / SoundCloud / Mixcloud / その他
+    架空のURLは設定しない。将来JSからリンクを差し込むコンテナは data-social-list で明示。
+  -->
+  <section id="social" class="social" aria-labelledby="social-heading">
+    <div class="wrap">
+      <h2 class="section-title section-title--plain" id="social-heading">SNS</h2>
+      <div class="social__list" data-social-list>
+        <p class="social__placeholder">Coming Soon</p>
+      </div>
+    </div>
+  </section>
 
   <footer class="site-footer">
     <p>YU-X Official Page — Produced by Connect Spread PJ (CSPJ)</p>

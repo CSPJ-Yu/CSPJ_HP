@@ -35,6 +35,26 @@
 
 html { scroll-behavior: smooth; }
 
+/* ─── Skip link ──────────────────────────────── */
+/* 通常時は画面外に退避し、キーボードフォーカス時のみ表示する一般的な実装。 */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 0;
+  z-index: 300;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 0 0 8px 0;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -192,6 +212,11 @@ ul { list-style: none; }
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--ink-dim);
+}
+
+/* セクション番号を持たない見出し(SNS等)向けの軽いバリアント */
+.section-title--plain {
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 section {
@@ -369,6 +394,166 @@ section {
   letter-spacing: 0.04em;
 }
 
+/* ─── News（土台のみ。API未接続） ─────────────── */
+.news__placeholder {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+}
+
+/* 将来、data-news-list へJSが挿入するitem用のスタイル(現時点では未使用・未描画)。
+   画像あり/なし両方のレイアウトに対応する。 */
+.news__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.news__item {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.news__item--with-image {
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  align-items: start;
+}
+
+.news__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.news__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.news__date {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  margin-bottom: 0.35rem;
+}
+
+.news__title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.news__body {
+  color: var(--ink-dim);
+  font-size: 0.88rem;
+}
+
+/* ─── SNS Links（土台のみ。API未接続） ─────────── */
+.social {
+  border-top: 1px solid var(--line);
+  padding: clamp(3rem, 6vw, 4.5rem) 0;
+}
+
+.social__placeholder {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+}
+
+/* 将来、data-social-list へJSが挿入するリンク用のスタイル(現時点では未使用・未描画)。
+   enabled=true の項目だけがこの形で描画される想定。 */
+.social__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.social__link {
+  display: block;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.social__link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ─── Popup（土台のみ。Flyer Modalとは独立した実装） ─── */
+/* 今回はAPI未接続のため自動表示しない。表示条件・頻度制御も今回は対象外。 */
+.popup-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.popup-modal.is-open {
+  display: flex;
+}
+
+.popup-modal__inner {
+  position: relative;
+  max-width: min(90vw, 420px);
+  max-height: 85vh;
+  width: 100%;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.popup-modal__close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-alt);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.popup-modal__img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.popup-modal__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  padding-right: 1.5rem;
+}
+
+.popup-modal__body {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+}
+
 /* ─── Footer ─────────────────────────────────── */
 .site-footer {
   border-top: 1px solid var(--line);
@@ -421,6 +606,14 @@ section {
   .schedule__item {
     grid-template-columns: 1fr;
     gap: 0.4rem;
+  }
+
+  .news__item--with-image {
+    grid-template-columns: 1fr;
+  }
+
+  .news__image {
+    max-width: 220px;
   }
 }
 
