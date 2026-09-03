@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    公開ポータル(/dj/index.html)からはまだリンクしていない準備中ページのため、
+    実データ・実素材が揃うまでの間、検索エンジンには一旦インデックスさせない。
+    本番公開が確定したら削除すること。
+  -->
+  <meta name="robots" content="noindex">
+  <meta name="description" content="YU-X 公式サイト（Connect Spread PJ制作）。準備中のセクションがあります。">
+  <title>YU-X — Connect Spread PJ</title>
+
+  <!--
+    このページは /dj/yu-x/ 配下で完結する完全独立サイトです。
+    CSPJ本体の /css/style.css / /js/main.js、DJポータルの /dj/style.css、
+    および /dj/sample/ のCSS/JSは一切読み込みません。
+
+    デザインは今回まだ確定させておらず、後から差し替えやすいよう
+    ニュートラルな配色・システムフォントのみで構成しています。
+  -->
+  <link rel="stylesheet" href="style.css">
+
+  <!--
+    CSPJ共通のデータ取得モジュール(データ取得のみ・HTML/CSSは含まない)。
+    読み込み順に注意: utils.js → api-client.js → schedule-data.js
+    詳細は /dj/README.md の「9. 公開API移行方針」を参照。
+  -->
+  <script src="/dj/shared/js/utils.js"></script>
+  <script src="/dj/shared/js/api-client.js"></script>
+  <script src="/dj/shared/js/schedule-data.js"></script>
+</head>
+<body>
+
+  <header class="site-header" id="top">
+    <div class="site-header__inner">
+      <a href="#top" class="brand">YU-X</a>
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="#profile">Profile</a>
+        <a href="#schedule">Schedule</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero__inner">
+        <p class="hero__eyebrow">Connect Spread PJ Presents</p>
+        <h1 class="hero__title">YU-X</h1>
+        <!-- TODO(CSPJ): 正式なキャッチコピー/プロフィール文が届き次第、下記を差し替える -->
+        <p class="hero__tagline">プロフィール準備中です。</p>
+        <a href="#profile" class="hero__cta">Scroll ↓</a>
+      </div>
+    </section>
+
+    <section id="profile" class="profile">
+      <div class="wrap">
+        <h2 class="section-title"><span>01</span>Profile</h2>
+        <div class="profile__grid">
+          <!-- TODO(CSPJ): プロフィール写真が届き次第、この枠に <img> を差し込む -->
+          <div class="profile__photo" aria-hidden="true"><span>PHOTO</span></div>
+          <div class="profile__text">
+            <!-- TODO(CSPJ): 正式なプロフィール文章(活動歴・得意ジャンル・出演実績など)が
+                 届き次第、下記のプレースホルダーを差し替える -->
+            <p>プロフィール情報を準備中です。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="schedule" class="schedule">
+      <div class="wrap">
+        <h2 class="section-title"><span>02</span>Schedule</h2>
+        <!--
+          初期表示は静的なプレースホルダー。JSでAPI取得に成功した場合のみ
+          .schedule__list の中身を実データで置き換える。取得に失敗した場合は
+          このプレースホルダーをそのまま維持する(script.js参照)。
+        -->
+        <ul class="schedule__list">
+          <li class="schedule__placeholder">現在、出演予定情報を準備中です。</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>YU-X Official Page — Produced by Connect Spread PJ (CSPJ)</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
