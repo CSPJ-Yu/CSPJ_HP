@@ -19,8 +19,11 @@
 
   <!--
     CSPJ共通のスケジュール取得モジュール（データ取得のみ・HTML/CSSは含まない）。
+    このページはCSVモード（events.sample.csv）で動作するため、utils.js（日付整形/HTMLエスケープ
+    の共通utility）とschedule-data.jsのみを読み込む。APIモードで使う api-client.js は不要。
     詳細は /dj/README.md および /dj/shared/js/schedule-data.js を参照。
   -->
+  <script src="/dj/shared/js/utils.js"></script>
   <script src="/dj/shared/js/schedule-data.js"></script>
 </head>
 <body>

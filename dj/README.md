@@ -208,3 +208,91 @@ CSPJSchedule.loadFlyerImage(ev.flyer_url)
 - `schedule-data.js` の `escapeHtml()` を必ず経由してから描画する(スプレッドシートの値は
   外部入力として扱い、そのまま`innerHTML`に差し込まない)
 - APIキーやOAuth認証は一切不要(公開CSVの読み取りのみのため、鍵の漏洩リスクが存在しない)
+
+## 9. 公開API移行方針(2026-09確定 / Eventsのみ実装済み)
+
+Cloudflare D1 + R2 + 公開API(`api.CSPJ_HP`、本番: `https://api.cs-pj.com`)への移行方針。
+**現時点でEvents(Schedule)のみAPIモードへ対応済みです。** DJ一覧・DJプロフィール・News・
+Social Links・Popupは未着手のままです(1〜8章のGoogle Sheets / Forms運用は、Eventsについても
+CSVモードとして`schedule-data.js`内に残っており、廃止していません)。
+
+### 9-1. Events(Schedule) — 実装済み
+
+`dj/shared/js/schedule-data.js`の`fetchEvents()`は、渡すoptionsによってAPIモード/CSVモードを
+自動判定する両対応になりました:
+
+```html
+<script src="/dj/shared/js/utils.js"></script>
+<script src="/dj/shared/js/api-client.js"></script>
+<script src="/dj/shared/js/schedule-data.js"></script>
+<script>
+  CSPJSchedule.fetchEvents({ slug: 'yu-x' })   // ← APIモード(実際のDJページはこちら)
+    .then((events) => { /* 描画 */ })
+    .catch((err) => { /* 静的HTMLのプレースホルダーを維持 */ });
+</script>
+```
+
+- `{ slug: '<DJのslug>' }` を渡すと、`https://api.cs-pj.com/v1/djs/<slug>/events` から取得します
+  (新規`api-client.js`が担当)。`status`等の公開判定はAPI側の責務で、フロント側では一切
+  再実装・再フィルタしません。
+- `{ csvUrl: '...' }` を渡す従来のCSVモードは変更なく残っており、`/dj/sample/`の技術サンプルは
+  引き続きこちらを使います(API化していません。D1/manage側に`sample`という架空DJを作る必要も
+  ありません)。
+- 画像URLは`image_url`が正規フィールドです。既存のDJページ実装(`ev.flyer_url`参照)を一度に
+  書き換えずに済むよう、両モードとも`flyer_url`を`image_url`と同じ値のエイリアスとして
+  併せて返す互換設計にしています(段階的に`image_url`へ移行可能)。
+- `formatDateParts()` / `escapeHtml()`は`dj/shared/js/utils.js`(新規)へ分離しました。
+  `CSPJSchedule.formatDateParts` / `CSPJSchedule.escapeHtml`としての公開は維持しています
+  (実装をCSPJUtilsへ委譲するだけで、呼び出し側の変更は不要)。
+- `parseCSV()` / `buildSheetCsvUrl()` / Drive画像解決(`extractDriveFileId()`等)は削除して
+  いません。`/dj/sample/`が実際に使用しているためです(過去にこのREADMEで「移行完了後に削除」
+  としていた方針を修正)。
+- `loadFlyerImage()`は変更していません。API由来の`image_url`(Drive形式ではない直リンク)も
+  「Drive形式でない場合はそのまま1回だけ試す」という既存の分岐にそのまま乗るため、実装の
+  変更が不要でした。
+
+### 9-2. DJ一覧・DJプロフィール — 今回は対象外
+
+- DJ一覧(`dj/index.html`の`.dj-grid`)は引き続き静的HTMLの手動更新のままです。公開APIに
+  DJ一覧を返すエンドポイント(`GET /v1/djs`等)が無いため、現状は動的化できません。
+- DJプロフィール(bio文章・タグ・写真等)は、そもそもD1(`djs`テーブル)にそれらのカラムが
+  存在せず、公開APIも`slug`/`display_name`のみしか返しません。各DJページのプロフィール
+  セクションは、引き続き各ページのHTMLに直接記述する運用です。
+
+### 9-3. News / Social Links / Popup — 未着手
+
+`GET /v1/djs/:slug/news` `GET /v1/djs/:slug/social-links` `GET /v1/djs/:slug/popup` は
+API側で稼働済みですが、CSPJ_HP側の取得モジュール(`news-data.js` / `social-data.js` /
+`popup-data.js`)・表示実装はまだ作成していません。
+
+### 残す / 置き換える / 不要になる の仕分け(Events実装後・確定)
+
+事前計画時点では「API移行完了後に削除」としていた項目のうち、`/dj/sample/`をCSVモードの
+まま永続的に残す方針が確定したため、**実際には何も削除していません**。CSVモードの唯一の
+利用者である`/dj/sample/`が、まさにこれらの関数を使い続けるためです。
+
+| 現状の関数・ファイル | 実施結果 |
+|---|---|
+| `formatDateParts()` / `escapeHtml()` | **維持・移動**。`dj/shared/js/utils.js`(新規)へ実体を移動。`CSPJSchedule`からの公開は委譲のみで維持 |
+| `fetchEvents()` の関数名・返却データ形式 | **維持(拡張)**。`{slug}`(APIモード)/`{csvUrl}`(CSVモード)の両対応に拡張。返却オブジェクトに`image_url`を追加(`flyer_url`は維持・エイリアス化) |
+| `loadFlyerImage()` | **維持・変更なし**。API由来の`image_url`もDrive形式でない直リンクとして同じ分岐で処理できるため、実装変更は不要だった |
+| `parseCSV()` | **維持**。`/dj/sample/`がCSVモードで使用し続けるため削除しない |
+| `buildSheetCsvUrl()` | **維持**。現状呼び出し箇所は無いが、CSVモードの公開APIとして残す |
+| `extractDriveFileId()` / `resolveDriveImageCandidates()` | **維持**。`/dj/sample/`のDrive URL解決デモ(events.sample.csvのs003行)で実際に使用中 |
+| CSV用フォールバックID生成(`date__venue__index`) | **維持**。CSVモード専用のロジックとして残る(APIモードでは使われない) |
+| `dj/sample/events.sample.csv` | **恒久的に維持**。API化しない技術サンプルとして今後も使用する |
+
+### モジュール構成(Events実装済み)
+
+```
+dj/shared/js/
+├─ api-client.js    … ✅実装済み。公開APIへの共通fetch処理(認証不要・JSON取得のみ)
+├─ utils.js         … ✅実装済み。formatDateParts() / escapeHtml() 等、データ非依存の共通utility
+├─ schedule-data.js … ✅Events実装済み(API/CSV両対応)。fetchEvents()の名称・返却形式は維持
+├─ news-data.js     … 未実装(次のステップ)
+├─ social-data.js   … 未実装
+└─ popup-data.js    … 未実装
+```
+
+各DJ固有の`script.js`は描画・UI制御のみを担当し、共有モジュール側はデータ取得・共通処理のみを
+担当する、という現行の責務分離の考え方をそのまま踏襲しています。

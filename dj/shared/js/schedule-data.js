@@ -3,28 +3,55 @@
  * /dj/shared/js/schedule-data.js
  *
  * 目的:
- *   Google Sheets（を想定したCSVエンドポイント）から出演スケジュールを取得・正規化する
- *   「データ取得だけ」を共通化したモジュールです。
- *
+ *   出演スケジュールを取得・正規化する「データ取得だけ」を共通化したモジュールです。
  *   HTML生成・CSS・デザインは一切含みません。各DJページは、このモジュールが返す
  *   プレーンなJSオブジェクト配列を受け取り、完全に自由なHTML/CSSで描画してください。
  *
- * 使い方（最小構成）:
+ * 【2026-09 公開API移行】
+ *   fetchEvents() は呼び出し時のoptionsによって2つのモードを自動判定します:
+ *
+ *   - APIモード（実際のDJページはこちらを使う）: `{ slug: '<djのslug>' }` を渡す。
+ *     公開API（api.cs-pj.com、/dj/shared/js/api-client.js 経由）からJSONで取得する。
+ *     公開/非公開・期限切れ等の判定はAPI側で完結しており、ここでは一切再実装・再検証しない。
+ *
+ *   - CSVモード（既存互換。/dj/sample/ の技術サンプルは今後もこちらを使い続ける）:
+ *     `{ csvUrl: '...' }` を渡す。Google SheetsのCSVエクスポート、またはローカルCSVファイルを
+ *     fetchしてパースする。このモードのコード（parseCSV / buildSheetCsvUrl / Google Drive画像
+ *     解決）は、API移行後も /dj/sample/ が実際に使用しているため削除していません
+ *     （events.sample.csv の s003 行は、Drive URL解決の失敗→外部リンクフォールバックの
+ *     デモを兼ねています）。
+ *
+ *   どちらのモードでも返却データの形は統一されています（fetchEvents のJSDoc参照）。
+ *   画像URLは新フィールド `image_url` が正規ですが、既存のDJページ実装（`ev.flyer_url` を
+ *   参照するコード）を一度に書き換えずに済むよう、両モードとも `flyer_url` を
+ *   `image_url` と同じ値のエイリアスとして併せて返します（段階的に `image_url` へ
+ *   移行できるようにするための互換措置。値はどちらも常に同一で、一方だけが更新される
+ *   ことはありません）。
+ *
+ * 使い方（APIモード・実際のDJページ）:
+ *   <script src="/dj/shared/js/utils.js"></script>
+ *   <script src="/dj/shared/js/api-client.js"></script>
  *   <script src="/dj/shared/js/schedule-data.js"></script>
  *   <script>
- *     CSPJSchedule.fetchEvents({ csvUrl: 'https://docs.google.com/.../export?format=csv&gid=0' })
- *       .then(events => { ...自分のHTMLで描画... })
- *       .catch(err => { ...失敗時は静的HTMLのプレースホルダーをそのまま残す... });
+ *     CSPJSchedule.fetchEvents({ slug: 'yu-x' })
+ *       .then((events) => { ...自分のHTMLで描画... })
+ *       .catch((err) => {
+ *         // 取得失敗時（DJ不存在／非公開／ネットワークエラー等）は既存の静的HTML
+ *         // （プレースホルダー）をそのまま残すこと。
+ *         console.warn('[Schedule] 読み込み失敗:', err.message);
+ *       });
  *   </script>
  *
- * 運用モデル（2026-08時点の設計）:
- *   DJごとに専用シート（専用タブ／専用gid）を持つ「個別タブ方式」を採用しています。
- *   Apps Scriptによる中央Events集約は行いません（詳細は /dj/README.md 参照）。
+ * 使い方（CSVモード・従来互換 / dj/sample/）:
+ *   <script src="/dj/shared/js/utils.js"></script>
+ *   <script src="/dj/shared/js/schedule-data.js"></script>
+ *   <script>
+ *     CSPJSchedule.fetchEvents({ csvUrl: 'events.sample.csv', djId: 'sample' })
+ *       .then((events) => { ... })
+ *       .catch((err) => { ... });
+ *   </script>
  *
- *   ただし将来「全DJ横断の中央Eventsタブ + dj_id列」方式へ移行しても、DJページ側の
- *   呼び出しコードを変更せずに済むよう、このモジュールは取得したCSVに dj_id 列が
- *   存在する場合は自動的にそれでフィルタし、存在しない場合は引数の djId をそのまま
- *   各イベントに付与するだけ、という両対応の設計にしてあります。
+ * 移行方針の詳細は /dj/README.md の「9. 公開API移行方針」を参照。
  */
 (function (global) {
   'use strict';
@@ -32,6 +59,7 @@
   /* ============================================================
      A) CSVパーサー（RFC 4180準拠：ダブルクォート・カンマ・改行対応）
      DJ SENNA公式サイト（/js/main.js）の実装をベースにしています。
+     【維持】/dj/sample/ の技術サンプル（CSVモード）が引き続き使用します。
      ============================================================ */
   function parseCSV(text) {
     const rows = [];
@@ -56,6 +84,8 @@
 
   /* ============================================================
      B) Google SheetsのCSVエクスポートURLを組み立てるヘルパー
+     【維持】CSVモードの利用者向けに残しています。現時点でこのリポジトリ内に実際の
+     呼び出し箇所はありません（/dj/sample/ はローカルCSVのファイル名を直接指定しているため）。
      ============================================================ */
   function buildSheetCsvUrl(sheetId, gid) {
     const g = (gid === undefined || gid === null || gid === '') ? '0' : gid;
@@ -63,39 +93,29 @@
   }
 
   /* ============================================================
-     C) "YYYY-MM-DD" → { year, month:"09", monthName:"SEP", day:"12" }
+     C) 日付整形 / D) HTMLエスケープ
+     【変更】実体は /dj/shared/js/utils.js（CSPJUtils）へ移動しました。データ取得元
+     （CSV/API）に依存しない共通utilityとして分離するためです。ここでは後方互換のため
+     CSPJSchedule.formatDateParts / CSPJSchedule.escapeHtml として引き続き公開しますが、
+     実装はCSPJUtilsへの委譲のみです（呼び出し側のコード変更は不要）。
      ============================================================ */
-  const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  function formatDateParts(dateStr) {
-    const parts = (dateStr || '').split('-');
-    if (parts.length < 3) return null;
-    const [y, m, d] = parts;
-    const monthIdx = parseInt(m, 10) - 1;
-    if (isNaN(monthIdx) || monthIdx < 0 || monthIdx > 11) return null;
-    return {
-      year: y,
-      month: String(m).padStart(2, '0'),
-      monthName: MONTH_NAMES[monthIdx],
-      day: String(d).padStart(2, '0'),
-    };
+  function requireUtils() {
+    if (!global.CSPJUtils) {
+      throw new Error(
+        '[CSPJSchedule] CSPJUtils が見つかりません。<script src="/dj/shared/js/utils.js"> を ' +
+        'schedule-data.js より前に読み込んでください。'
+      );
+    }
+    return global.CSPJUtils;
   }
-
-  /* ============================================================
-     D) HTMLエスケープ（外部入力＝スプレッドシートの値をinnerHTMLへ
-        差し込む前に必ず通すこと。DJ本人やフォーム経由の入力を信用しない）
-     ============================================================ */
-  function escapeHtml(str) {
-    return String(str == null ? '' : str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  function formatDateParts(dateStr) { return requireUtils().formatDateParts(dateStr); }
+  function escapeHtml(str) { return requireUtils().escapeHtml(str); }
 
   /* ============================================================
      E) Google DriveのファイルURLからFILE_IDを抽出（フライヤー画像用・任意）
-        DJ SENNA公式サイトの実装をベースにしています。
+     DJ SENNA公式サイトの実装をベースにしています。
+     【維持】/dj/sample/ の技術サンプルが、Drive URL解決の成功/失敗パターンを具体的に
+     確認するために使用しています（events.sample.csv 参照）。
      ============================================================ */
   function extractDriveFileId(rawUrl) {
     if (!rawUrl) return null;
@@ -120,21 +140,21 @@
     ];
   }
 
-  /** flyer_url（Driveの共有URLでも、それ以外の直リンク画像URLでもよい）から、
+  /** flyer_url/image_url（Driveの共有URLでも、それ以外の直リンク画像URLでもよい）から、
    *  実際にブラウザで読み込める画像URLをPromiseで返す汎用ユーティリティ。
    *
    *  試行順序:
    *    1. rawUrlがGoogle DriveのURL形式 → lh3.googleusercontent.com → drive.google.com/uc の順に試す
    *    2. Drive形式でない場合 → rawUrlをそのまま1回だけ試す
    *  すべて失敗した場合はreject。呼び出し側は「元のURLを新規タブで開く」等の
-   *  外部リンクにフォールバックすること（画像そのものは表示できないだけで、
-   *  リンク自体は生きている可能性があるため）。
+   *  外部リンクにフォールバックすること。
    *
-   *  DOM要素にもモーダルにも依存しない（<img>を裏で1つ生成して読み込み試験するだけ）ため、
-   *  ボタンやモーダルの見た目はDJページ側で完全に自由に実装できる。 */
+   *  【2026-09 API移行】公開APIが返す `image_url`（api.cs-pj.com配下の直リンク）は
+   *  Drive形式ではないため、自動的に上記2.の分岐（そのまま1回だけ試す）に入ります。
+   *  Drive解決ロジックと共存できるため、本関数自体への変更は不要でした。 */
   function loadFlyerImage(rawUrl) {
     return new Promise((resolve, reject) => {
-      if (!rawUrl) { reject(new Error('flyer_url is empty')); return; }
+      if (!rawUrl) { reject(new Error('image url is empty')); return; }
 
       const driveCandidates = resolveDriveImageCandidates(rawUrl);
       const candidates = driveCandidates.length ? driveCandidates : [rawUrl];
@@ -155,49 +175,45 @@
   }
 
   /* ============================================================
-     F) メイン: fetchEvents
-     ------------------------------------------------------------
-     引数:
-       csvUrl        : CSVとして取得できるURL（Google SheetsのCSVエクスポートURL、
-                        もしくはローカルの.csvファイルなど。fetchできれば何でもよい）
-       djId          : このDJの識別子（任意）。
-                        - シートに dj_id 列がある場合 → その値でフィルタする
-                        - dj_id 列が無い場合（個別タブ方式）→ 返却する各イベントに
-                          そのまま付与するだけで、フィルタは行わない
-       statusFilter  : この値と一致する status の行だけを残す（既定値 "active"）。
-                        null / false を渡すとstatusによる絞り込みを無効化できる。
+     F-1) APIモード: 公開API（api.cs-pj.com）からeventsを取得
+     ============================================================ */
+  async function fetchEventsFromApi(slug) {
+    const api = global.CSPJApi;
+    if (!api) {
+      throw new Error(
+        '[CSPJSchedule] CSPJApi が見つかりません。<script src="/dj/shared/js/api-client.js"> を ' +
+        'schedule-data.js より前に読み込んでください。'
+      );
+    }
+    const json = await api.getJson(api.djPath(slug, 'events'));
+    const rawEvents = (json && json.events) || [];
 
-     返り値: Promise<Array<{
-       event_id, dj_id, date, event_name,
-       venue, location, type, status, flyer_url, memo
-     }>>
-       date昇順でソート済み（同日はシート内の行順を維持）。
-       date列が空／不正な行は除外される。
-       event_id列が無い場合は "date__venue__index" を仮のIDとして生成する。
+    return rawEvents.map((row) => ({
+      event_id: row.event_id,
+      dj_id: slug,
+      date: row.date,
+      event_name: row.event_name,
+      venue: row.venue,
+      location: row.location,
+      type: row.type,
+      // API側は「公開してよいもの（status='published'）」だけを返す設計であり、
+      // その判定をここで再実装・再検証はしない（返ってきた時点で公開確定として扱う）。
+      status: 'published',
+      image_url: row.image_url,  // 正規フィールド。未設定の場合は null（呼び出し側はnullチェックのみでよい）
+      flyer_url: row.image_url,  // 既存互換フィールド（段階移行用エイリアス。値はimage_urlと同一）
+      memo: '',                   // 公開APIは内部メモを一切返さない設計のため、常に空文字
+    }));
+  }
 
-       注: 出演時刻（start_time等）はこのスキーマでは扱いません。
-       イベント確定時点でタイムテーブルが未確定なことが多い、1イベント内で
-       同じDJが複数回出演するケースがある、といった理由から、正確な時刻は
-       フライヤー画像を見てもらう運用としています（flyer_url参照）。
-     ------------------------------------------------------------
-     失敗時（fetch失敗・必須列なし・0件等）は必ずrejectする。
-     呼び出し側は .catch() で受け、既存の静的HTML（プレースホルダー）を
-     そのまま残すフォールバックを行うこと（SENNA公式サイトと同じ設計思想）。
+  /* ============================================================
+     F-2) CSVモード: 既存実装（挙動は変更なし。image_urlフィールドを追加で併記するのみ）
      ============================================================ */
   const KNOWN_COLUMNS = [
     'event_id', 'dj_id', 'date', 'event_name',
     'venue', 'location', 'type', 'status', 'flyer_url', 'memo',
   ];
 
-  async function fetchEvents(options) {
-    const {
-      csvUrl,
-      djId = '',
-      statusFilter = 'active',
-    } = options || {};
-
-    if (!csvUrl) throw new Error('fetchEvents: csvUrl は必須です');
-
+  async function fetchEventsFromCsv({ csvUrl, djId, statusFilter }) {
     const res = await fetch(csvUrl);
     if (!res.ok) throw new Error(`Sheet fetch failed: HTTP ${res.status}`);
 
@@ -221,6 +237,7 @@
         const rowDjId = hasSheetDjId ? get('dj_id') : djId;
         const date = get('date');
         const rawEventId = get('event_id');
+        const flyerUrl = get('flyer_url');
         return {
           event_id: rawEventId || `${date || 'nodate'}__${get('venue') || 'novenue'}__${i}`,
           dj_id: rowDjId,
@@ -230,7 +247,8 @@
           location: get('location'),
           type: get('type'),
           status: get('status'),
-          flyer_url: get('flyer_url'),
+          image_url: flyerUrl || null, // APIモードと呼び出し側インターフェースを揃えるための追加(既存のflyer_urlは維持)
+          flyer_url: flyerUrl,
           memo: get('memo'),
         };
       })
@@ -246,14 +264,64 @@
       events = events.filter((ev) => ev.status.toLowerCase() === String(statusFilter).toLowerCase());
     }
 
-    // 日付のみで昇順ソート（同日内の並び順はシート内の行順を維持する安定ソート）
+    return events;
+  }
+
+  /* ============================================================
+     F) メイン: fetchEvents
+     ------------------------------------------------------------
+     呼び出し時のoptionsで、APIモード / CSVモードを自動判定します:
+       - options.slug がある（かつ csvUrl が無い） → APIモード
+       - options.csvUrl がある                      → CSVモード（従来互換）
+
+     引数:
+       slug          : 【APIモード用】DJのslug（例: 'yu-x'）
+       csvUrl        : 【CSVモード用】CSVとして取得できるURL
+       djId          : 【CSVモード用】dj_id列が無いCSVで各行に付与するID(任意)。
+                        APIモードでは無視されます（常に slug が dj_id として使われます）。
+       statusFilter  : 【CSVモード用】この値と一致するstatusの行だけを残す（既定値 "active"）。
+                        APIモードでは無視されます — 公開判定はAPI側の責務であり、
+                        フロント側で再実装・再フィルタしないという方針のためです。
+
+     返り値: Promise<Array<{
+       event_id, dj_id, date, event_name, venue, location, type, status,
+       image_url, flyer_url, memo
+     }>>
+       date昇順でソート済み（同日はモード内の取得順を維持する安定ソート）。
+       image_url が正規フィールド、flyer_url はそれと同一値の後方互換エイリアスです
+       （どちらか一方だけ未設定になることはなく、常に両方nullか両方同じURLです）。
+
+     失敗時（fetch失敗・DJ不存在/非公開である404・必須列なし・0件等）は必ずrejectします。
+     呼び出し側は .catch() で受け、既存の静的HTML（プレースホルダー）をそのまま残す
+     フォールバックを行うこと（従来と同じ設計思想。API移行によってこの契約は変えていません）。
+     ------------------------------------------------------------
+     注: 出演時刻（start_time等）はこのスキーマでは扱いません（従来方針を踏襲）。
+     ============================================================ */
+  async function fetchEvents(options) {
+    const {
+      slug,
+      csvUrl,
+      djId = '',
+      statusFilter = 'active',
+    } = options || {};
+
+    let events;
+    if (csvUrl) {
+      events = await fetchEventsFromCsv({ csvUrl, djId, statusFilter });
+    } else if (slug) {
+      events = await fetchEventsFromApi(slug);
+    } else {
+      throw new Error('fetchEvents: slug（APIモード）または csvUrl（CSVモード）のいずれかが必須です');
+    }
+
+    // 日付のみで昇順ソート（同日内の並び順は取得順を維持する安定ソート）
     events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     return events;
   }
 
   /* ============================================================
-     公開API
+     公開API（変更なし。formatDateParts/escapeHtmlのみ実装をCSPJUtilsへ委譲）
      ============================================================ */
   global.CSPJSchedule = {
     fetchEvents,
