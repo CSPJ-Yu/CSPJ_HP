@@ -7,6 +7,67 @@ Connect Spread PJ（CSPJ）の公式Webサイト。
 
 ---
 
+## デプロイ・運用(2026-09確定)
+
+### Git
+
+```
+Repository:
+https://github.com/CSPJ-Yu/CSPJ_HP
+
+Production branch:
+main
+```
+
+### Cloudflare
+
+CSPJ本体はCloudflare PagesのGit連携方式でデプロイします。
+
+```
+GitHub main
+  ↓
+Cloudflare自動デプロイ
+  ↓
+cs-pj.com
+```
+
+**手動アップロード方式(Direct Upload)は通常運用には使用しません。** `main`へのpushが本番デプロイのトリガーです。
+
+### 公開サイト
+
+```
+https://cs-pj.com/
+https://cs-pj.com/dj/
+https://cs-pj.com/dj/<slug>/
+```
+
+### 通常の更新フロー
+
+```
+1. ローカルCSPJ_HPを編集
+2. 動作確認
+3. git add
+4. git commit
+5. git push origin main
+6. Cloudflare Pagesが自動デプロイ
+7. cs-pj.comで本番確認
+```
+
+### プロジェクト分離
+
+CSPJ公開HP本体と管理システムは完全に別プロジェクト・別リポジトリです。
+
+```
+CSPJ_HP        → cs-pj.com
+manage.CSPJ_HP → manage.cs-pj.com
+```
+
+`manage.CSPJ_HP`のコード・設定・D1 migration・Cloudflare Access設定などを、このリポジトリ
+(`CSPJ_HP`)へ混在させないこと。逆に本リポジトリの静的サイトのコード・設定を`manage.CSPJ_HP`へ
+混在させないこと。
+
+---
+
 ## デザインコンセプト
 
 - **配色**: ダークグレー（#0e0e0e）基調のモノトーン
