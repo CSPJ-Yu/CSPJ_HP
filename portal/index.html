@@ -126,6 +126,24 @@
           <span class="portal-secondary__arrow" aria-hidden="true">→</span>
         </a>
       </div>
+
+      <!--
+        Utility / Staff Access — DJ・管理者向けのログイン導線。
+        一般ユーザー向けのPortal Categories(DJ/EVENT/WORKS/SHOP)とは明確に区別し、
+        控えめな扱いにする(派手なCTAにしない)。認証自体はmanage.cs-pj.com側の
+        Cloudflare Accessが担当するため、ここでは単純な外部リンクのみを設置する
+        (ログインフォーム・メール入力・Access関連コードはPortal側に追加しない)。
+      -->
+      <div class="portal-container portal-utility">
+        <a class="portal-utility__link"
+           href="https://manage.cs-pj.com/"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="CSPJ管理システムへログイン(別タブで開きます)">
+          <span class="portal-utility__text">DJ / ADMIN LOGIN</span>
+          <span class="portal-utility__arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
     </section>
 
   </main>

@@ -413,6 +413,41 @@ button:focus-visible {
   }
 }
 
+/* ─── Utility / Staff Access(DJ / ADMIN LOGIN) ───────────────
+   Portal Categoriesの大きなカードとは明確に区別する、控えめな
+   1行リンク。通常時はミュートカラー、hover/focus時のみアクセント色。
+   manage.cs-pj.com側の認証(Cloudflare Access)には一切関与しない、
+   単純な外部リンク。 */
+.portal-utility {
+  padding-top: 0.5rem;
+}
+.portal-utility__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  padding: 0.6rem 0.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.portal-utility__link:hover,
+.portal-utility__link:focus-visible {
+  color: var(--color-accent);
+}
+.portal-utility__arrow {
+  display: inline-block;
+  font-size: 0.9em;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.portal-utility__link:hover .portal-utility__arrow,
+.portal-utility__link:focus-visible .portal-utility__arrow {
+  transform: translate(2px, -2px);
+}
+
 /* ============================================================
    Footer
    ============================================================ */
