@@ -64,22 +64,14 @@
         </div>
 
         <!--
-          DJ — 現時点でのCSPJの主要コンテンツ。ただし /portal/dj/ 自体は
-          今回のフェーズではまだ制作していないため、本番で404にならないよう
-          あえて <a href="/portal/dj/"> にはせず、非インタラクティブな
-          <div> として実装し「COMING SOON」表示にしている。
-
-          TODO(CSPJ): /portal/dj/ 完成後、次の変更のみで有効化できる。
-            1. 下の <div class="portal-feature" ...> を
-               <a class="portal-feature" href="/portal/dj/"> に変更
-            2. aria-disabled="true" を削除
-            3. .portal-feature__badge (Coming Soon表示) の <span> を削除
-          クラス名・内部構造・CSSは変更不要。
+          DJ — CSPJの主要コンテンツ。/portal/dj/ が完成したため、
+          正式にリンク化(<a href="/portal/dj/">)している。
+          (旧: 非インタラクティブな<div> + Coming Soon表示だったが、
+          TODO(CSPJ)の手順に沿って有効化済み)
         -->
-        <div class="portal-feature reveal-up" aria-disabled="true" aria-describedby="dj-feature-status">
+        <a class="portal-feature reveal-up" href="/portal/dj/">
           <span class="portal-feature__index" aria-hidden="true">01</span>
           <div class="portal-feature__body">
-            <span class="portal-feature__badge" id="dj-feature-status">Coming Soon</span>
             <h3 class="portal-feature__name">DJ</h3>
             <p class="portal-feature__desc">Artists / Profiles / Schedule</p>
             <span class="portal-feature__cta">
@@ -87,7 +79,7 @@
               <span class="portal-feature__arrow" aria-hidden="true">→</span>
             </span>
           </div>
-        </div>
+        </a>
 
         <!--
           EVENT / WORKS / SHOP — 現時点で実ページが存在しないカテゴリ。

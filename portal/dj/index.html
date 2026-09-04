@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    CSPJのDJ一覧の正規URLは今回から /portal/dj/ に統一されました。
+    まだ全体公開のタイミングを判断していないため、/portal/ 側と同様に
+    noindexを維持する。正式公開はPortal全体でまとめて判断する。
+  -->
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Connect Spread PJ（CSPJ）が制作・運営するDJ公式サイトのポータル。所属・提携DJそれぞれの個別サイトへのリンクを掲載しています。">
+  <title>DJ Portal — Connect Spread PJ</title>
+
+  <link rel="icon" href="/images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+  <!--
+    /portal/dj/ は /portal/ の子ページですが、CSS/JSファイルとしては
+    /portal/style.css / /portal/script.js を読み込みません(意図的に分離)。
+    CSPJ本体(/css/style.css /js/main.js)・旧DJポータル(/dj/style.css)・
+    各DJページのCSS/JSともいずれも共有しない、完全に独立したページです。
+    デザイントークン(色・フォント)は /portal/ に揃えていますが、値をこの
+    ファイルに複製しているため、/portal/側のCSSを変更してもこのページには
+    影響しません。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/portal/dj/style.css">
+</head>
+<body class="djp">
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="djp-header">
+    <div class="djp-header__inner">
+      <a href="/portal/" class="djp-header__back" aria-label="Portalへ戻る">
+        <span aria-hidden="true">←</span> Portal
+      </a>
+      <span class="djp-header__label">DJ Portal</span>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+
+    <!-- ============ Hero ============ -->
+    <section class="djp-hero">
+      <div class="djp-container">
+        <p class="djp-hero__eyebrow reveal-fade">CSPJ — Portal</p>
+        <h1 class="djp-hero__title reveal-up">DJ PORTAL</h1>
+        <p class="djp-hero__sub reveal-up">Artists / Profiles / Schedule</p>
+        <p class="djp-hero__lead reveal-fade">
+          Connect Spread PJが制作・サポートするDJの公式サイトをまとめたポータルページです。<br class="djp-only-pc">
+          各DJのサイトは、それぞれ独立したデザイン・世界観で制作されています。
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ Artist Grid ============ -->
+    <section class="djp-list" aria-labelledby="djp-list-heading">
+      <div class="djp-container">
+        <div class="djp-list__header reveal-fade">
+          <span class="djp-list__label">Artists</span>
+          <h2 class="djp-list__title" id="djp-list-heading">Artist Sites</h2>
+        </div>
+
+        <!--
+          将来、CSPJ公開APIからDJ一覧を取得して自動生成する可能性がある
+          コンテナ(data-dj-grid)。今回は存在しないAPIを推測実装せず、
+          静的なカードのみを配置している。API対応時もこのコンテナの
+          構造・クラス名はそのまま利用できる想定。
+
+          カード構造は「PHOTO / DJ NAME / GENRE / VIEW ARTIST →」の順。
+          写真・ジャンル・プロフィール文などDJ本人から未提供の情報は
+          推測で作成していない(sample以外のDJカードは今回追加していない)。
+        -->
+        <div class="djp-grid" data-dj-grid>
+
+          <!-- Sample artist card(技術サンプル。/dj/sample/ 参照) -->
+          <a href="/dj/sample/" class="djp-card reveal-up">
+            <div class="djp-card__photo djp-card__photo--placeholder" aria-hidden="true"></div>
+            <div class="djp-card__body">
+              <h3 class="djp-card__name">DJ SAMPLE</h3>
+              <span class="djp-card__genre">Sample</span>
+              <p class="djp-card__desc">独立したCSS・JSで動作するアーティストサイトのサンプルページです。</p>
+              <span class="djp-card__link">VIEW ARTIST <span aria-hidden="true">→</span></span>
+            </div>
+          </a>
+
+          <!--
+            YU-Xについて: /dj/yu-x/ は現在制作中(noindex)のため、
+            一般公開導線としてのカードは今回追加していない。
+            公開判断は既存のnoindex状態を変更するタイミングで別途行う。
+          -->
+
+          <!-- 今後、DJが追加されるとここにカードが並びます -->
+          <div class="djp-card djp-card--placeholder reveal-up" aria-hidden="true">
+            <div class="djp-card__photo"></div>
+            <div class="djp-card__body">
+              <h3 class="djp-card__name">Next Artist</h3>
+              <span class="djp-card__genre">Coming Soon</span>
+              <p class="djp-card__desc">今後、こちらに新しいDJサイトが追加されていきます。</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="djp-footer">
+    <div class="djp-container djp-footer__inner">
+      <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+    </div>
+  </footer>
+
+  <script src="/portal/dj/script.js"></script>
+</body>
+</html>

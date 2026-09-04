@@ -1,0 +1,13 @@
+# CSPJ_HP — Cloudflare Pages redirects
+#
+# DJ一覧の正規URLは /portal/dj/ に統一されました(2026-09)。
+# 旧DJ一覧ルート /dj/ (完全一致のみ)だけを /portal/dj/ へ301転送します。
+#
+# 重要: ワイルドカード(/dj/* 等)は使用しません。
+# 個別DJサイト(/dj/<slug>/ 、例: /dj/yu-x/ /dj/sample/)は
+# このファイルのどのルールにも一致せず、引き続き通常どおり配信されます。
+# Cloudflare Pagesはリダイレクトを静的アセットの配信より先に評価するため、
+# dj/index.html を削除していても /dj/ 配下の個別ページには影響しません。
+
+/dj    /portal/dj/   301
+/dj/   /portal/dj/   301

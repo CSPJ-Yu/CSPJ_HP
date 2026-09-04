@@ -1,0 +1,364 @@
+/* =============================================
+   Connect Spread PJ — /portal/dj/ Stylesheet
+   /portal/ の子ポータル(DJ一覧)。CSPJ本体(/css/style.css)・
+   旧DJポータル(/dj/style.css)・各DJページのCSS/JS・/portal/style.css の
+   いずれとも読み込みを共有しない、完全に独立したスタイルシートです。
+   デザイントークンは /portal/ に合わせていますが、値をここに複製している
+   ため、/portal/側のCSSを変更してもこのページには影響しません。
+   クラス名はすべて "djp-" プレフィックス。
+   ============================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Color Palette(CSPJ本体・/portal/と同一値) */
+  --djp-color-bg:           #0e0e0e;
+  --djp-color-surface:      #141414;
+  --djp-color-surface-alt:  #1a1a1a;
+  --djp-color-border:       #252525;
+  --djp-color-border-light: #2e2e2e;
+
+  --djp-color-text-primary:   #e8e8e4;
+  --djp-color-text-secondary: #8a8a84;
+  --djp-color-text-muted:     #555550;
+  --djp-color-accent:      #c8c0a8;   /* warm off-white accent */
+  --djp-color-cyan:        #00ddfa;   /* brand cyan — 限定使用 */
+
+  /* Typography */
+  --djp-font-serif: 'Cormorant Garamond', 'Noto Serif JP', Georgia, serif;
+  --djp-font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --djp-font-ja:    'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+
+  /* Layout */
+  --djp-container-max: 1120px;
+  --djp-container-pad: clamp(1.25rem, 6vw, 3rem);
+
+  /* Motion */
+  --djp-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --djp-dur-fast: 0.25s;
+  --djp-dur-med:  0.6s;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--djp-color-bg);
+  color: var(--djp-color-text-primary);
+  font-family: var(--djp-font-sans);
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* ─── Focus visibility ─────────────────────── */
+a:focus-visible,
+button:focus-visible {
+  outline: 1.5px solid var(--djp-color-accent);
+  outline-offset: 4px;
+}
+
+/* ─── Skip Link ─────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 1000;
+  background: var(--djp-color-accent);
+  color: var(--djp-color-bg);
+  padding: 0.6em 1.2em;
+  font-family: var(--djp-font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 2px;
+  transition: top var(--djp-dur-fast) var(--djp-ease-out);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* ─── Layout Utility ────────────────────────── */
+.djp-container {
+  max-width: var(--djp-container-max);
+  margin: 0 auto;
+  padding: 0 var(--djp-container-pad);
+}
+
+.djp-only-pc { display: none; }
+@media (min-width: 768px) {
+  .djp-only-pc { display: inline; }
+}
+
+/* ─── Scroll Reveal ──────────────────────────── */
+.reveal-fade,
+.reveal-up {
+  opacity: 0;
+  transition: opacity var(--djp-dur-med) var(--djp-ease-out), transform var(--djp-dur-med) var(--djp-ease-out);
+}
+.reveal-up { transform: translateY(20px); }
+.revealed.reveal-fade,
+.revealed.reveal-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.djp-header {
+  border-bottom: 1px solid var(--djp-color-border);
+  padding: 1.25rem 0;
+}
+.djp-header__inner {
+  max-width: var(--djp-container-max);
+  margin: 0 auto;
+  padding: 0 var(--djp-container-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.djp-header__back {
+  font-family: var(--djp-font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--djp-color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  transition: color var(--djp-dur-fast) var(--djp-ease-out);
+}
+.djp-header__back:hover,
+.djp-header__back:focus-visible {
+  color: var(--djp-color-text-primary);
+}
+.djp-header__label {
+  font-family: var(--djp-font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--djp-color-text-muted);
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.djp-hero {
+  padding: clamp(3rem, 10vw, 6.5rem) 0 clamp(2.5rem, 6vw, 4rem);
+}
+.djp-hero__eyebrow {
+  font-family: var(--djp-font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--djp-color-text-muted);
+  margin-bottom: 1.5rem;
+}
+.djp-hero__title {
+  font-family: var(--djp-font-serif);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 9vw, 4.5rem);
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--djp-color-text-primary);
+  margin-bottom: 0.75rem;
+}
+.djp-hero__sub {
+  font-family: var(--djp-font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--djp-color-accent);
+  margin-bottom: 1.75rem;
+}
+.djp-hero__lead {
+  font-family: var(--djp-font-ja);
+  font-weight: 300;
+  font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+  line-height: 2;
+  color: var(--djp-color-text-secondary);
+  max-width: 40em;
+}
+
+/* ============================================================
+   Artist Grid
+   ============================================================ */
+.djp-list {
+  padding: clamp(2rem, 6vw, 4rem) 0 clamp(4rem, 10vw, 7rem);
+  border-top: 1px solid var(--djp-color-border);
+}
+.djp-list__header {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+.djp-list__label {
+  display: block;
+  font-family: var(--djp-font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--djp-color-text-muted);
+  margin-bottom: 1rem;
+}
+.djp-list__title {
+  font-family: var(--djp-font-serif);
+  font-weight: 300;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--djp-color-text-primary);
+}
+
+.djp-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--djp-color-border);
+  border: 1px solid var(--djp-color-border);
+}
+@media (min-width: 640px) {
+  .djp-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .djp-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ─── Card ───────────────────────────────────
+   雑誌の目次のようなカード。PHOTO → DJ NAME → GENRE → VIEW ARTIST の順で
+   情報階層を明確にする(モバイルでの読み取り順を最優先)。 */
+.djp-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--djp-color-bg);
+  transition: background var(--djp-dur-fast) var(--djp-ease-out);
+}
+a.djp-card:hover,
+a.djp-card:focus-visible {
+  background: var(--djp-color-surface);
+}
+
+.djp-card__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2826 50%, #1a1a18 100%);
+}
+.djp-card__photo--placeholder {
+  background: linear-gradient(135deg, #1c2226 0%, #172024 50%, #0e1618 100%);
+  position: relative;
+}
+.djp-card__photo--placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 221, 250, 0.12), transparent 60%);
+}
+
+.djp-card__body {
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+}
+.djp-card__name {
+  font-family: var(--djp-font-serif);
+  font-weight: 400;
+  font-size: 1.3rem;
+  letter-spacing: 0.01em;
+  color: var(--djp-color-text-primary);
+}
+.djp-card__genre {
+  font-family: var(--djp-font-sans);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--djp-color-cyan);
+}
+.djp-card__desc {
+  font-family: var(--djp-font-ja);
+  font-size: 0.8rem;
+  line-height: 1.9;
+  color: var(--djp-color-text-secondary);
+  font-weight: 300;
+}
+.djp-card__link {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-family: var(--djp-font-sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--djp-color-text-primary);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.djp-card--placeholder {
+  opacity: 0.45;
+}
+.djp-card--placeholder .djp-card__name,
+.djp-card--placeholder .djp-card__genre,
+.djp-card--placeholder .djp-card__desc {
+  color: var(--djp-color-text-muted);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.djp-footer {
+  border-top: 1px solid var(--djp-color-border);
+  padding: 1.75rem 0;
+}
+.djp-footer__inner {
+  text-align: center;
+}
+.djp-footer small {
+  font-family: var(--djp-font-sans);
+  font-size: 0.75rem;
+  color: var(--djp-color-text-muted);
+}
+
+/* ============================================================
+   Desktop — 余白を広げる
+   ============================================================ */
+@media (min-width: 1024px) {
+  :root {
+    --djp-container-max: 1200px;
+  }
+}
+
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-fade,
+  .reveal-up {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
