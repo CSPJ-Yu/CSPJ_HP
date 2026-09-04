@@ -17,9 +17,13 @@
     CSPJ本体の /css/style.css / /js/main.js、DJポータルの /dj/style.css、
     および /dj/sample/ のCSS/JSは一切読み込みません。
 
-    デザインは今回まだ確定させておらず、後から差し替えやすいよう
-    ニュートラルな配色・システムフォントのみで構成しています。
+    正式デザイン(Monochrome Editorial + Industrial + Digital Signal の
+    ハイブリッド)。見出し用の太字書体としてInterのみ追加(欧文表示のみに
+    使用。日本語文はOS標準フォントにフォールバックする)。
   -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
   <!--
@@ -53,9 +57,22 @@
 
   <main id="main-content" tabindex="-1">
     <section class="hero">
+      <!-- Digital要素: 極めて控えめなsignal/waveform表現(装飾のみ、aria-hidden)。 -->
+      <svg class="hero__signal" viewBox="0 0 800 70" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,35 L60,35 L80,10 L100,60 L120,35 L220,35 L240,18 L260,52 L280,35
+                 L380,35 L400,8 L420,62 L440,35 L560,35 L580,20 L600,50 L620,35
+                 L720,35 L740,15 L760,55 L780,35 L800,35" />
+      </svg>
+
+      <!-- 将来アーティスト写真を追加する場合: ここに
+           <div class="hero__portrait"><img src="..." alt=""></div> を追加し、
+           .hero に hero--photo クラスを付与する(style.css参照)。
+           写真が無い現状はこのままで成立するレイアウトになっている。 -->
+
       <div class="hero__inner">
         <p class="hero__eyebrow">Connect Spread PJ Presents</p>
         <h1 class="hero__title">YU-X</h1>
+        <p class="hero__role">DJ<span class="hero__role-sep" aria-hidden="true">/</span>ARTIST</p>
         <!-- TODO(CSPJ): 正式なキャッチコピー/プロフィール文が届き次第、下記を差し替える -->
         <p class="hero__tagline">プロフィール準備中です。</p>
         <a href="#profile" class="hero__cta">Scroll ↓</a>

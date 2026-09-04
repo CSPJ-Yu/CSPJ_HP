@@ -94,20 +94,31 @@
       console.warn('[Schedule] 読み込み失敗 → 静的HTMLのプレースホルダーを維持:', err.message);
     });
 
+  // 表示のみを「DATE / EVENT・VENUE・LOCATION / TAG・FLYER」の3ブロックに
+  // 分けて情報階層を明確にしている(正式デザイン反映)。fetchEvents()が返す
+  // データ自体・各フィールドの意味・Flyer Modalの処理は変更していない。
   function renderScheduleItem(ev) {
     const { escapeHtml, formatDateParts } = CSPJSchedule;
     const d = formatDateParts(ev.date);
-    const dateLabel = d ? `${d.year}.${d.month}.${d.day}` : ev.date;
-    const venueLabel = ev.event_name
-      ? `${ev.event_name} — ${ev.venue}`
-      : ev.venue;
+    const dateMd = d ? `${d.month}.${d.day}` : ev.date;
+    const dateY = d ? d.year : '';
+
+    const infoParts = [];
+    if (ev.event_name) infoParts.push(`<span class="schedule__event">${escapeHtml(ev.event_name)}</span>`);
+    if (ev.venue) infoParts.push(`<span class="schedule__venue">${escapeHtml(ev.venue)}</span>`);
+    if (ev.location) infoParts.push(`<span class="schedule__location">${escapeHtml(ev.location)}</span>`);
 
     const li = document.createElement('li');
     li.className = 'schedule__item';
     li.innerHTML = `
-      <span class="schedule__date">${escapeHtml(dateLabel)}</span>
-      <span class="schedule__venue">${escapeHtml(venueLabel)}${ev.location ? ` / ${escapeHtml(ev.location)}` : ''}</span>
-      <span class="schedule__tag">${escapeHtml((ev.type || 'EVENT').toUpperCase())}</span>
+      <div class="schedule__date">
+        <span class="schedule__date-md">${escapeHtml(dateMd)}</span>
+        <span class="schedule__date-y">${escapeHtml(dateY)}</span>
+      </div>
+      <div class="schedule__info">${infoParts.join('')}</div>
+      <div class="schedule__aside">
+        <span class="schedule__tag">${escapeHtml((ev.type || 'EVENT').toUpperCase())}</span>
+      </div>
     `;
 
     // image_url(正規フィールド。flyer_urlは互換エイリアス)がある行だけ
@@ -120,7 +131,7 @@
       btn.className = 'schedule__flyer-btn';
       btn.textContent = 'FLYERを見る';
       btn.addEventListener('click', () => openFlyerModal(flyerSrc));
-      li.appendChild(btn);
+      li.querySelector('.schedule__aside').appendChild(btn);
     }
 
     return li;
@@ -241,6 +252,7 @@
     modal.innerHTML = `
       <div class="popup-modal__inner">
         <button type="button" class="popup-modal__close" aria-label="閉じる">✕</button>
+        <span class="popup-modal__label" aria-hidden="true">Notice</span>
         <img class="popup-modal__img" alt="" style="display:none;">
         <h2 class="popup-modal__title" id="popup-modal-title"></h2>
         <p class="popup-modal__body" id="popup-modal-body"></p>
