@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    制作途中(/portal/dj/ 未完成)のため、本番公開が確定するまで検索エンジンには
+    インデックスさせない。全カテゴリの導線が確認でき次第、noindexを解除する。
+  -->
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Connect Spread PJ（CSPJ）総合ポータル。DJ / EVENT / WORKS / SHOP など、CSPJ内の各カテゴリへの入口です。">
+  <title>Portal — Connect Spread PJ</title>
+
+  <link rel="icon" href="/images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+  <!--
+    /portal/ は CSPJ本体(/css/style.css /js/main.js)・DJポータル(/dj/style.css)・
+    各DJページのCSS/JSのいずれとも読み込みを共有しない、完全に独立したページです。
+    デザイントークン(色・フォント)はCSPJ本体に合わせていますが、ファイルとしては
+    別物なので、本体側のCSSを編集してもこのページには影響しません。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/portal/style.css">
+</head>
+<body class="portal">
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="portal-header">
+    <div class="portal-header__inner">
+      <a href="/" class="portal-header__back" aria-label="Connect Spread PJ トップへ戻る">
+        <span aria-hidden="true">←</span> Connect Spread PJ
+      </a>
+      <span class="portal-header__label">Portal</span>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+
+    <!-- ============ Hero ============ -->
+    <section class="portal-hero">
+      <div class="portal-container">
+        <p class="portal-hero__eyebrow reveal-fade">CSPJ — General Portal</p>
+        <h1 class="portal-hero__title reveal-up">PORTAL</h1>
+        <p class="portal-hero__brand reveal-up">Connect Spread PJ</p>
+        <p class="portal-hero__desc reveal-fade">
+          Connect Spread PJが運営する各カテゴリへの入口です。<br class="portal-only-pc">
+          進みたい場所を選んでください。
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ Portal Categories ============ -->
+    <section class="portal-categories" aria-labelledby="categories-heading">
+      <div class="portal-container">
+        <div class="portal-categories__header reveal-fade">
+          <span class="portal-categories__label">Categories</span>
+          <h2 class="portal-categories__title" id="categories-heading">Portal Categories</h2>
+        </div>
+
+        <!--
+          DJ — 現時点でのCSPJの主要コンテンツ。ただし /portal/dj/ 自体は
+          今回のフェーズではまだ制作していないため、本番で404にならないよう
+          あえて <a href="/portal/dj/"> にはせず、非インタラクティブな
+          <div> として実装し「COMING SOON」表示にしている。
+
+          TODO(CSPJ): /portal/dj/ 完成後、次の変更のみで有効化できる。
+            1. 下の <div class="portal-feature" ...> を
+               <a class="portal-feature" href="/portal/dj/"> に変更
+            2. aria-disabled="true" を削除
+            3. .portal-feature__badge (Coming Soon表示) の <span> を削除
+          クラス名・内部構造・CSSは変更不要。
+        -->
+        <div class="portal-feature reveal-up" aria-disabled="true" aria-describedby="dj-feature-status">
+          <span class="portal-feature__index" aria-hidden="true">01</span>
+          <div class="portal-feature__body">
+            <span class="portal-feature__badge" id="dj-feature-status">Coming Soon</span>
+            <h3 class="portal-feature__name">DJ</h3>
+            <p class="portal-feature__desc">Artists / Profiles / Schedule</p>
+            <span class="portal-feature__cta">
+              ENTER DJ PORTAL
+              <span class="portal-feature__arrow" aria-hidden="true">→</span>
+            </span>
+          </div>
+        </div>
+
+        <!--
+          EVENT / WORKS / SHOP — 現時点で実ページが存在しないカテゴリ。
+          実在しないURLへはリンクしない方針のため、非インタラクティブな
+          <div> + Coming Soon表示のみ。将来ページ制作時に個別対応する。
+        -->
+        <div class="portal-minor-grid">
+          <div class="portal-minor reveal-up" aria-disabled="true">
+            <span class="portal-minor__index" aria-hidden="true">02</span>
+            <h3 class="portal-minor__name">EVENT</h3>
+            <span class="portal-minor__badge">Coming Soon</span>
+          </div>
+          <div class="portal-minor reveal-up" aria-disabled="true">
+            <span class="portal-minor__index" aria-hidden="true">03</span>
+            <h3 class="portal-minor__name">WORKS</h3>
+            <span class="portal-minor__badge">Coming Soon</span>
+          </div>
+          <div class="portal-minor reveal-up" aria-disabled="true">
+            <span class="portal-minor__index" aria-hidden="true">04</span>
+            <h3 class="portal-minor__name">SHOP</h3>
+            <span class="portal-minor__badge">Coming Soon</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Secondary Links ============ -->
+    <section class="portal-secondary" aria-label="補助リンク">
+      <div class="portal-container portal-secondary__inner">
+        <a class="portal-secondary__link" href="/">
+          <span class="portal-secondary__text">CSPJ WEBSITE</span>
+          <span class="portal-secondary__arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="portal-secondary__link" href="/#contact">
+          <span class="portal-secondary__text">CONTACT</span>
+          <span class="portal-secondary__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="portal-footer">
+    <div class="portal-container portal-footer__inner">
+      <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+    </div>
+  </footer>
+
+  <script src="/portal/script.js"></script>
+</body>
+</html>

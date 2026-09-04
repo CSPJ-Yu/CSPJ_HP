@@ -1,0 +1,464 @@
+/* =============================================
+   Connect Spread PJ — /portal/ Stylesheet
+   総合ポータル。CSPJ本体(/css/style.css)・DJポータル(/dj/style.css)・
+   各DJページのCSSとは一切共有しない、完全に独立したスタイルシートです。
+   デザイントークンはCSPJ本体に合わせていますが、値をここに複製しているため、
+   本体側のCSSを変更してもこのページには影響しません。
+   ============================================= */
+
+/* ─── Reset & Base ─────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Color Palette(CSPJ本体と同一値) */
+  --color-bg:           #0e0e0e;
+  --color-surface:      #141414;
+  --color-surface-alt:  #1a1a1a;
+  --color-border:       #252525;
+  --color-border-light: #2e2e2e;
+
+  --color-text-primary:   #e8e8e4;
+  --color-text-secondary: #8a8a84;
+  --color-text-muted:     #555550;
+  --color-accent:      #c8c0a8;   /* warm off-white accent */
+  --color-accent-dark: #9a9282;
+  --color-cyan:        #00ddfa;   /* brand cyan accent */
+  --color-cyan-dim:    rgba(0, 221, 250, 0.12);
+
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', 'Noto Serif JP', Georgia, serif;
+  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+
+  /* Layout */
+  --container-max: 960px;
+  --container-pad: clamp(1.25rem, 6vw, 3rem);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 0.25s;
+  --dur-med:  0.6s;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* ─── Focus visibility(キーボード操作対応) ─────── */
+a:focus-visible,
+button:focus-visible {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* ─── Skip Link ─────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 1000;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  padding: 0.6em 1.2em;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 2px;
+  transition: top var(--dur-fast) var(--ease-out);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* ─── Layout Utility ────────────────────────── */
+.portal-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.portal-only-pc { display: none; }
+@media (min-width: 768px) {
+  .portal-only-pc { display: inline; }
+}
+
+/* ─── Scroll Reveal(control-motionはJS/CSS両方で吸収) ─── */
+.reveal-fade,
+.reveal-up {
+  opacity: 0;
+  transition: opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out);
+}
+.reveal-up { transform: translateY(20px); }
+.revealed.reveal-fade,
+.revealed.reveal-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.portal-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 0;
+}
+.portal-header__inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.portal-header__back {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.portal-header__back:hover,
+.portal-header__back:focus-visible {
+  color: var(--color-text-primary);
+}
+.portal-header__label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.portal-hero {
+  padding: clamp(3.5rem, 12vw, 8rem) 0 clamp(2.5rem, 8vw, 5rem);
+  text-align: center;
+}
+.portal-hero__eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+.portal-hero__title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(3.2rem, 14vw, 6.5rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+}
+.portal-hero__brand {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 2rem;
+}
+.portal-hero__desc {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(0.9rem, 2.4vw, 1rem);
+  color: var(--color-text-secondary);
+  max-width: 32em;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   Portal Categories
+   ============================================================ */
+.portal-categories {
+  padding: clamp(2rem, 6vw, 4rem) 0 clamp(3rem, 8vw, 6rem);
+}
+.portal-categories__header {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+.portal-categories__label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+.portal-categories__title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--color-text-primary);
+}
+
+/* ─── DJ Feature Card ──────────────────────── */
+/* 雑誌の目次のような佇まい: 大きなインデックス番号 + 罫線区切り。
+   現時点では非インタラクティブな<div>(下記コメント参照)。 */
+.portal-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.25rem, 4vw, 2rem);
+  margin-bottom: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-left: 3px solid var(--color-accent);
+  position: relative;
+}
+.portal-feature__index {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  color: var(--color-accent-dark);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.portal-feature__body {
+  flex: 1;
+  min-width: 0;
+}
+.portal-feature__badge {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-cyan);
+  background: var(--color-cyan-dim);
+  border: 1px solid rgba(0, 221, 250, 0.3);
+  padding: 0.3em 0.8em;
+  border-radius: 999px;
+  margin-bottom: 0.9rem;
+}
+.portal-feature__name {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+.portal-feature__desc {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.01em;
+  margin-bottom: 1.25rem;
+}
+.portal-feature__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: 0.4em;
+}
+.portal-feature__arrow {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+/* 有効化後(<a>化後)を想定したホバー演出。現状は非インタラクティブなため発火しない。 */
+.portal-feature:is(a):hover .portal-feature__cta,
+.portal-feature:is(a):focus-visible .portal-feature__cta {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-accent);
+}
+.portal-feature:is(a):hover .portal-feature__arrow,
+.portal-feature:is(a):focus-visible .portal-feature__arrow {
+  transform: translateX(4px);
+}
+
+/* ─── Minor Categories(EVENT / WORKS / SHOP) ─── */
+.portal-minor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+}
+.portal-minor {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem clamp(1.25rem, 4vw, 1.75rem);
+  background: var(--color-bg);
+}
+.portal-minor__index {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+.portal-minor__name {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+.portal-minor__badge {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-light);
+  padding: 0.35em 0.7em;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+@media (min-width: 600px) {
+  .portal-minor-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .portal-minor {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.5rem;
+  }
+}
+
+/* ============================================================
+   Secondary Links
+   ============================================================ */
+.portal-secondary {
+  padding: 0 0 clamp(3rem, 8vw, 5rem);
+}
+.portal-secondary__inner {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border);
+}
+.portal-secondary__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 1.15rem 0.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  transition: color var(--dur-fast) var(--ease-out), padding-left var(--dur-fast) var(--ease-out);
+}
+.portal-secondary__link:hover,
+.portal-secondary__link:focus-visible {
+  color: var(--color-text-primary);
+  padding-left: 0.5rem;
+}
+.portal-secondary__arrow {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.portal-secondary__link:hover .portal-secondary__arrow,
+.portal-secondary__link:focus-visible .portal-secondary__arrow {
+  transform: translateX(4px);
+}
+
+@media (min-width: 600px) {
+  .portal-secondary__inner {
+    flex-direction: row;
+  }
+  .portal-secondary__link {
+    flex: 1;
+    border-bottom: none;
+  }
+  .portal-secondary__link + .portal-secondary__link {
+    border-left: 1px solid var(--color-border);
+    padding-left: 1.5rem;
+  }
+  .portal-secondary__link:hover,
+  .portal-secondary__link:focus-visible {
+    padding-left: 0.25rem;
+  }
+  .portal-secondary__link + .portal-secondary__link:hover,
+  .portal-secondary__link + .portal-secondary__link:focus-visible {
+    padding-left: 2rem;
+  }
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.portal-footer {
+  border-top: 1px solid var(--color-border);
+  padding: 1.75rem 0;
+}
+.portal-footer__inner {
+  text-align: center;
+}
+.portal-footer small {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   Breakpoints — Desktop以上で余白と存在感を強調
+   ============================================================ */
+@media (min-width: 1024px) {
+  :root {
+    --container-max: 1040px;
+  }
+  .portal-feature {
+    padding: 3.5rem 3rem;
+  }
+  .portal-feature__index {
+    font-size: 3.25rem;
+  }
+}
+
+/* ============================================================
+   Reduced Motion — すべてのアニメーション/トランジションを無効化
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-fade,
+  .reveal-up {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
