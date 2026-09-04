@@ -140,9 +140,21 @@
 
   </main>
 
-  <footer class="portal-footer">
+  <!--
+    Footer — CSPJ共通Footer(cs-pj.comトップページの /index.html 内 <footer class="footer">
+    を基準に統一。HTML構造・表示文言・コピーライトを揃えている)。DJ個別サイト
+    (/dj/<slug>/)は対象外で、それぞれ独自Footerを使用する(dj/README.md参照)。
+  -->
+  <footer class="portal-footer" role="contentinfo">
     <div class="portal-container portal-footer__inner">
-      <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+      <div class="portal-footer__brand">
+        <span class="portal-footer__logo-bg">
+          <img src="/images/logo_new.png" alt="Connect Spread PJ" class="portal-footer__logo-img">
+        </span>
+      </div>
+      <div class="portal-footer__copy">
+        <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+      </div>
     </div>
   </footer>
 

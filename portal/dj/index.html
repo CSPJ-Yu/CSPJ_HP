@@ -111,9 +111,20 @@
     </section>
   </main>
 
-  <footer class="djp-footer">
+  <!--
+    Footer — CSPJ共通Footer(cs-pj.comトップページの /index.html 内 <footer class="footer">
+    を基準に統一。/portal/ 側と同じ内容・構造)。DJ個別サイト(/dj/<slug>/)は対象外。
+  -->
+  <footer class="djp-footer" role="contentinfo">
     <div class="djp-container djp-footer__inner">
-      <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+      <div class="djp-footer__brand">
+        <span class="djp-footer__logo-bg">
+          <img src="/images/logo_new.png" alt="Connect Spread PJ" class="djp-footer__logo-img">
+        </span>
+      </div>
+      <div class="djp-footer__copy">
+        <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+      </div>
     </div>
   </footer>
 

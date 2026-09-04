@@ -66,6 +66,20 @@ manage.CSPJ_HP → manage.cs-pj.com
 (`CSPJ_HP`)へ混在させないこと。逆に本リポジトリの静的サイトのコード・設定を`manage.CSPJ_HP`へ
 混在させないこと。
 
+### ページ制作ルール — Footer統一方針(2026-09確定)
+
+```
+CSPJ共通ページ（/、/portal/、/portal/dj/、今後の /portal/event/ /portal/works/ /portal/shop/ 等）
+→ cs-pj.comトップ（/index.html）と同じ共通Footerを使用する
+
+個別DJサイト /dj/<slug>/（例: /dj/yu-x/）
+→ DJごとの独自Footerを使用してよい（共通Footerに合わせる必要はない）
+```
+
+共通Footerの基準は常に`/index.html`の`<footer class="footer">`。各ページのCSSファイルは
+独立構成のままとし（無理に共通CSS化はしない）、Footerに必要なスタイルのみを各ページ側へ
+複製して反映する運用とする。
+
 ---
 
 ## デザインコンセプト
