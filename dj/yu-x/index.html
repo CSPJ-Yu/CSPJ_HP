@@ -28,13 +28,16 @@
 
   <!--
     CSPJ共通のデータ取得モジュール(データ取得のみ・HTML/CSSは含まない)。
-    読み込み順に注意: utils.js → api-client.js → schedule-data.js
+    読み込み順に注意: utils.js → api-client.js → schedule-data.js → news-data.js → popup-data.js
+    (schedule-data.jsの読み込み位置・内容は変更していない)
     詳細は /dj/README.md の「9. 公開API移行方針」を参照。
-    現時点でAPI接続しているのはSCHEDULEのみ(NEWS/SNS/POPUPは土台のみ)。
+    現時点でAPI接続しているのはSCHEDULE / NEWS / POPUP(SNSは今回も土台のみ)。
   -->
   <script src="/dj/shared/js/utils.js"></script>
   <script src="/dj/shared/js/api-client.js"></script>
   <script src="/dj/shared/js/schedule-data.js"></script>
+  <script src="/dj/shared/js/news-data.js"></script>
+  <script src="/dj/shared/js/popup-data.js"></script>
 </head>
 <body>
 
@@ -102,14 +105,14 @@
           <span aria-hidden="true">02</span>News
         </h2>
         <!--
-          NEWS一覧はまだ公開APIに接続していない(土台のみ)。
-          将来のデータ形状: { title, body, image(任意), published_at }
-          画像あり/なし両方のitemに対応できるよう、.news__item--with-image を
-          任意で付与する想定(下記CSS参照)。
+          NEWS一覧 — 公開API接続済み(GET https://api.cs-pj.com/v1/djs/yu-x/news)。
+          データ取得・正規化は /dj/shared/js/news-data.js (CSPJNews.fetchNews) が
+          担当し、このページ固有の描画は script.js の initNews() が担当する
+          (責務分離)。画像あり/なし両方のitemに .news__item--with-image を
+          付与して対応(下記CSS参照)。
 
-          将来JSからNEWS一覧を差し込むコンテナは data-news-list で明示。
-          現時点ではinitNews()等のAPI接続処理は実装していない
-          (SCHEDULE以外のAPI URLを推測実装しないという方針のため)。
+          data-news-list はJSからの描画先コンテナ。0件・取得失敗時は、この
+          静的なCome Soonプレースホルダーをそのまま維持する(script.js参照)。
         -->
         <div class="news__list" data-news-list>
           <p class="news__placeholder">Coming Soon</p>

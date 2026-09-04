@@ -212,13 +212,73 @@
 })();
 
 /* ============================================================
-   NEWS — 現時点では公開APIに接続していない(土台のみ)。
-   .news__list (data-news-list) に「Coming Soon」を静的表示しているだけで、
-   動的な初期化処理は無い。将来ここに initNews() を追加し、
-   { title, body, image(任意), published_at } の配列を取得して
-   .news__item / .news__item--with-image を描画する想定
-   (SCHEDULE以外のAPI URLを推測実装しないという方針のため、今回は未実装)。
+   NEWS — CSPJ共通データ取得モジュール(/dj/shared/js/news-data.js)を
+   本番の公開API接続(GET https://api.cs-pj.com/v1/djs/yu-x/news)で使用する。
+
+   CSPJNews.fetchNews('yu-x') は内部でAPI経由の取得・正規化・公開日降順の
+   ソートまでを行う(公開/非公開の判定はAPI側の責務)。取得できない場合
+   (ネットワークエラー・DJ非公開等)や0件の場合は、index.htmlに書かれた
+   静的HTML(Coming Soonプレースホルダー)をそのまま残す。
    ============================================================ */
+(function initNews() {
+  const list = document.querySelector('[data-news-list]');
+  if (!list || !window.CSPJNews) return;
+
+  CSPJNews.fetchNews('yu-x')
+    .then((items) => {
+      if (!items.length) return; // 0件なら静的プレースホルダー(Coming Soon)を維持
+
+      list.innerHTML = '';
+      items.forEach((item) => list.appendChild(renderNewsItem(item)));
+
+      console.log(
+        `%c[News] ${items.length}件を公開APIから読み込みました`,
+        'color:#c6ff3d; font-weight:bold;'
+      );
+    })
+    .catch((err) => {
+      console.warn('[News] 読み込み失敗 → 静的HTMLのプレースホルダーを維持:', err.message);
+    });
+
+  // 画像の有無に関わらずレイアウトが成立するよう、テキスト(日付/タイトル/本文)を
+  // 常に1つのラッパーへまとめる。画像がある場合のみ .news__item--with-image を
+  // 付与し、.news__image を追加の1グリッドセルとして先頭に挿入する(CSS参照)。
+  // タイトル・本文は管理画面から入力される外部データのため、innerHTMLへ差し込む
+  // 前に必ず CSPJUtils.escapeHtml() を通す(XSS対策)。
+  function renderNewsItem(item) {
+    const { escapeHtml } = CSPJUtils;
+    const hasImage = !!item.image_url;
+
+    const article = document.createElement('article');
+    article.className = 'news__item' + (hasImage ? ' news__item--with-image' : '');
+
+    if (hasImage) {
+      const imageWrap = document.createElement('div');
+      imageWrap.className = 'news__image';
+      imageWrap.innerHTML = `<img src="${escapeHtml(item.image_url)}" alt="">`;
+      article.appendChild(imageWrap);
+    }
+
+    const content = document.createElement('div');
+    content.className = 'news__content';
+    content.innerHTML = `
+      <span class="news__date">${escapeHtml(formatNewsDate(item.publish_date))}</span>
+      <h3 class="news__title">${escapeHtml(item.title)}</h3>
+      <p class="news__body">${escapeHtml(item.body)}</p>
+    `;
+    article.appendChild(content);
+
+    return article;
+  }
+
+  // publish_date は "YYYY-MM-DD HH:MM:SS" 形式(時刻付き)で返ってくるため、
+  // CSPJUtils.formatDateParts(日付のみを想定)に渡す前に日付部分だけを取り出す。
+  function formatNewsDate(rawDate) {
+    const dateOnly = String(rawDate || '').split(' ')[0];
+    const parts = CSPJUtils.formatDateParts(dateOnly);
+    return parts ? `${parts.year}.${parts.month}.${parts.day}` : dateOnly;
+  }
+})();
 
 /* ============================================================
    SNS LINKS — 現時点では公開APIに接続していない(土台のみ)。
@@ -300,7 +360,36 @@
     m.querySelector('.popup-modal__close').focus();
   }
 
-  // 将来のAPI接続処理から呼び出せるよう公開する。今回はどこからも自動的に
-  // 呼び出さない(手動 `CSPJPopup.open({...})` でのみ開ける状態)。
+  // 他モジュールから呼び出せるよう公開する。
   window.CSPJPopup = { open: openPopup, close: closePopup };
+})();
+
+/* ============================================================
+   POPUP — 公開API接続(GET https://api.cs-pj.com/v1/djs/yu-x/popup)。
+   データ取得・正規化・期限切れ判定は /dj/shared/js/popup-data.js
+   (CSPJPopupData.fetchPopup) が担当する。モーダルのDOM生成・ARIA・
+   開閉処理(上のwindow.CSPJPopup)は無変更のまま利用するだけで、
+   ここでは「開くかどうか」の判断と、開く場合の呼び出しのみを行う。
+
+   ページ読み込み時に有効なPOPUPが取得できた場合のみ自動的に開く。
+   POPUPが無い/取得失敗/期限切れの場合は何もしない
+   (表示頻度制御(1日1回等)は今回のスコープ外)。
+   ============================================================ */
+(function initPopupApi() {
+  if (!window.CSPJPopupData || !window.CSPJPopup) return;
+
+  CSPJPopupData.fetchPopup('yu-x')
+    .then((popup) => {
+      if (!popup) return; // POPUPなし・取得失敗・期限切れ → 何もしない
+
+      window.CSPJPopup.open({
+        title: popup.title,
+        body: popup.body,
+        image: popup.image_url,
+      });
+    })
+    .catch((err) => {
+      // fetchPopup()は基本的にrejectしない設計だが、念のため保険として捕捉する。
+      console.warn('[Popup] 読み込み失敗 → 表示しない:', err.message);
+    });
 })();
