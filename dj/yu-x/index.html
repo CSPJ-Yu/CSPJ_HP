@@ -44,7 +44,16 @@
   <!-- キーボード操作者向けのスキップリンク。通常時は非表示、フォーカス時のみ表示。 -->
   <a class="skip-link" href="#main-content">本文へスキップ</a>
 
-  <header class="site-header" id="top">
+  <!--
+    ページ最上部へのアンカー先。以前はこのidを .site-header 自体に付けていたが、
+    ヘッダーは position:sticky のため、スクロール後は常にgetBoundingClientRect().top===0
+    を返してしまい、ブラウザが「すでに先頭にある」と判断してTOPへスクロールしない
+    不具合があった(左上のYU-Xロゴを押しても反応しない、という報告の原因)。
+    sticky化されない、この高さ0の要素を専用のアンカー先にすることで解消する。
+  -->
+  <div id="top" aria-hidden="true"></div>
+
+  <header class="site-header">
     <div class="site-header__inner">
       <a href="#top" class="brand">YU-X</a>
       <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
