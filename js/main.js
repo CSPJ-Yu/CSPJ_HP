@@ -167,84 +167,6 @@
   animateIn(scroll, 1500);
 })();
 
-/* ─── Contact form handler ───────────────────── */
-(function initContactForm() {
-  const form = document.getElementById('contactForm');
-  const successMsg = document.getElementById('form-success');
-  if (!form || !successMsg) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const submitBtn = form.querySelector('.form-submit');
-    const submitText = form.querySelector('.form-submit__text');
-
-    // Validate
-    const name = form.querySelector('#name').value.trim();
-    const email = form.querySelector('#email').value.trim();
-    const message = form.querySelector('#message').value.trim();
-
-    if (!name || !email || !message) {
-      shakeElement(submitBtn);
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      shakeElement(form.querySelector('#email'));
-      return;
-    }
-
-    // Loading state
-    submitBtn.disabled = true;
-    const originalText = submitText.textContent;
-    submitText.textContent = 'Sending...';
-
-    try {
-      // Save inquiry to table API
-      const response = await fetch('tables/inquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          service: form.querySelector('#service').value || 'Not specified',
-          message,
-          submitted_at: new Date().toISOString()
-        })
-      });
-
-      if (response.ok || response.status === 201) {
-        form.reset();
-        successMsg.removeAttribute('hidden');
-        successMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } else {
-        throw new Error('API error');
-      }
-    } catch (err) {
-      // Fallback: show success anyway (form data logged)
-      console.info('Form submitted (offline fallback):', { name, email });
-      form.reset();
-      successMsg.removeAttribute('hidden');
-      successMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } finally {
-      submitBtn.disabled = false;
-      submitText.textContent = originalText;
-    }
-  });
-
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function shakeElement(el) {
-    if (!el) return;
-    el.style.animation = 'none';
-    el.offsetHeight; // reflow
-    el.style.animation = 'shake 0.4s ease';
-    setTimeout(() => { el.style.animation = ''; }, 400);
-  }
-})();
-
 /* ─── Smooth scroll for anchor links ────────── */
 (function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -262,19 +184,4 @@
       window.scrollTo({ top, behavior: 'smooth' });
     });
   });
-})();
-
-/* ─── Inject keyframes ───────────────────────── */
-(function injectKeyframes() {
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%       { transform: translateX(-6px); }
-      40%       { transform: translateX(6px); }
-      60%       { transform: translateX(-4px); }
-      80%       { transform: translateX(4px); }
-    }
-  `;
-  document.head.appendChild(style);
 })();

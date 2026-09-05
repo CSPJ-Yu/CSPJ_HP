@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    送信先バックエンドAPI(POST /api/contact 等)がまだ確定・実装されていないため、
+    本番公開はまだ行わない。フォームUI・バリデーション・成功/失敗表示の土台のみ
+    完成させている段階(詳細はscript.js冒頭のコメント参照)。バックエンド接続・
+    最終確認後にnoindexを解除すること。
+  -->
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Connect Spread PJ（CSPJ）へのお問い合わせページ。Web制作・DJサイト制作・Visual/Flyer・Promotion・Eventなど、お気軽にご相談ください。">
+  <title>Contact — Connect Spread PJ</title>
+
+  <link rel="icon" href="/images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+  <!--
+    /contact/ はCSPJ共通ページとして、CSPJ本体(/index.html)とブランドトーン・
+    Footerを統一しているが、CSSファイルとしては /css/style.css を読み込まない
+    完全に独立したページ(/portal/ 等と同じ方針)。デザイントークンは本体から
+    値を複製しているため、本体側のCSSを変更してもこのページには影響しない。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/contact/style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="contact-header">
+    <div class="contact-header__inner">
+      <a href="/" class="contact-header__back" aria-label="Connect Spread PJ トップへ戻る">
+        <span aria-hidden="true">←</span> Connect Spread PJ
+      </a>
+      <span class="contact-header__label">Contact</span>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="contact-hero">
+      <div class="contact-container">
+        <p class="contact-hero__eyebrow reveal-fade">CSPJ — Contact</p>
+        <h1 class="contact-hero__title reveal-up">Contact</h1>
+        <p class="contact-hero__lead reveal-fade">
+          Web制作・DJサイト制作・Visual / Flyer・Promotion・Eventなど、<br class="contact-only-pc">
+          お気軽にご相談ください。内容を確認のうえ、担当より折り返しご連絡いたします。
+        </p>
+      </div>
+    </section>
+
+    <section class="contact-form-section" aria-labelledby="contact-form-heading">
+      <div class="contact-container">
+        <h2 class="contact-form-heading sr-only" id="contact-form-heading">Contact Form</h2>
+
+        <!--
+          フォーム本体。送信先API(POST /api/contact)は未確定のため、script.js側で
+          実際のfetch()は行っていない(バリデーション成功後、Turnstile検証・D1保存・
+          メール通知が確定次第、接続する想定)。この状態で送信されたと誤解されない
+          よう、成功時メッセージは「準備中」であることを正直に明示している。
+        -->
+        <form class="contact-form" id="contactForm" novalidate>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="name">
+              お名前 <span class="contact-form__required" aria-hidden="true">*</span>
+            </label>
+            <input
+              class="contact-form__input"
+              type="text"
+              id="name"
+              name="name"
+              autocomplete="name"
+              required
+              aria-required="true"
+              aria-describedby="error-name">
+            <p class="contact-form__error" id="error-name" role="alert"></p>
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="email">
+              メールアドレス <span class="contact-form__required" aria-hidden="true">*</span>
+            </label>
+            <input
+              class="contact-form__input"
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              required
+              aria-required="true"
+              aria-describedby="error-email">
+            <p class="contact-form__error" id="error-email" role="alert"></p>
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="inquiry-type">
+              お問い合わせ種別 <span class="contact-form__required" aria-hidden="true">*</span>
+            </label>
+            <select
+              class="contact-form__input contact-form__select"
+              id="inquiry-type"
+              name="inquiry_type"
+              required
+              aria-required="true"
+              aria-describedby="error-inquiry-type">
+              <option value="" disabled selected>選択してください</option>
+              <option value="web">Webサイト制作</option>
+              <option value="dj">DJサイト制作</option>
+              <option value="visual">Visual / Flyer</option>
+              <option value="promotion">Promotion</option>
+              <option value="event">Event</option>
+              <option value="other">その他</option>
+            </select>
+            <p class="contact-form__error" id="error-inquiry-type" role="alert"></p>
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="sns-url">
+              SNS / Web URL <span class="contact-form__optional">(任意)</span>
+            </label>
+            <input
+              class="contact-form__input"
+              type="text"
+              id="sns-url"
+              name="sns_url"
+              autocomplete="url"
+              placeholder="https://instagram.com/..."
+              aria-describedby="error-sns-url">
+            <p class="contact-form__error" id="error-sns-url" role="alert"></p>
+          </div>
+
+          <div class="contact-form__row">
+            <label class="contact-form__label" for="message">
+              お問い合わせ内容 <span class="contact-form__required" aria-hidden="true">*</span>
+            </label>
+            <textarea
+              class="contact-form__input contact-form__textarea"
+              id="message"
+              name="message"
+              rows="6"
+              required
+              aria-required="true"
+              aria-describedby="error-message"></textarea>
+            <p class="contact-form__error" id="error-message" role="alert"></p>
+          </div>
+
+          <div class="contact-form__row contact-form__row--checkbox">
+            <label class="contact-form__checkbox-label" for="privacy">
+              <input
+                class="contact-form__checkbox"
+                type="checkbox"
+                id="privacy"
+                name="privacy"
+                required
+                aria-required="true"
+                aria-describedby="error-privacy">
+              <span>プライバシーポリシーに同意します <span class="contact-form__required" aria-hidden="true">*</span></span>
+            </label>
+            <p class="contact-form__error" id="error-privacy" role="alert"></p>
+          </div>
+
+          <div class="contact-form__submit-wrap">
+            <button type="submit" class="contact-form__submit" id="contactSubmit">
+              <span class="contact-form__submit-text">Send Message</span>
+              <span class="contact-form__submit-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+
+          <!-- 成功時: フォームを非表示にしてこちらへ切り替える(script.js参照) -->
+          <div class="contact-form__success" id="contactSuccess" role="status" aria-live="polite" hidden>
+            <p class="contact-form__success-title">ご入力ありがとうございます。</p>
+            <p class="contact-form__success-body">
+              現在、送信システムを準備中のため、恐れ入りますが今回のご入力内容は
+              まだ送信されておりません。お急ぎの場合は
+              <a href="https://www.instagram.com/cspj.official/" target="_blank" rel="noopener noreferrer">Instagram(@cspj.official)</a>
+              よりご連絡ください。
+            </p>
+          </div>
+
+          <!-- 送信エラー時(将来API接続後、通信失敗時に表示する想定の土台) -->
+          <div class="contact-form__error-banner" id="contactErrorBanner" role="alert" aria-live="assertive" hidden>
+            <p>送信中にエラーが発生しました。時間をおいて再度お試しください。</p>
+          </div>
+
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!--
+    Footer — CSPJ共通Footer(cs-pj.comトップページの<footer class="footer">を
+    基準に統一。/portal/ /portal/dj/ と同じ構成)。
+  -->
+  <footer class="contact-footer" role="contentinfo">
+    <div class="contact-container contact-footer__inner">
+      <div class="contact-footer__brand">
+        <span class="contact-footer__logo-bg">
+          <img src="/images/logo_new.png" alt="Connect Spread PJ" class="contact-footer__logo-img">
+        </span>
+      </div>
+      <div class="contact-footer__copy">
+        <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/contact/script.js"></script>
+</body>
+</html>
