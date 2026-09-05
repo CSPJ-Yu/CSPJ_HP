@@ -1207,6 +1207,16 @@ ul { list-style: none; }
     display: none;
   }
 
+  /* .hero-scrollは元々 position:absolute; bottom:3rem で、hero-content内の
+     余白を前提に配置していた。モバイルではhero-servicesが縦積みになって
+     hero-contentが縦に伸びるため、絶対配置のままだとScrollがhero-services
+     の文字列に重なってしまう。静的配置に変えてhero-servicesの下へ自然に
+     流し込むことで、内容の高さに関わらず重ならないようにする。 */
+  .hero-scroll {
+    position: static;
+    margin-top: 2rem;
+  }
+
   .hero-corner-text {
     display: none;
   }
