@@ -310,6 +310,21 @@ textarea:focus-visible {
   cursor: pointer;
 }
 
+/* プライバシーポリシーへのリンク(チェックボックスのラベル内)。
+   ネストされた<a>をクリックした場合、ラベルの「チェックボックスへ処理を
+   転送する」既定動作は発生せず、リンク自体の遷移のみが行われる(ブラウザの
+   標準的な挙動。実機で検証済み・追加のJS制御は不要)。リンクだと分かる
+   よう下線+アクセントカラーで視覚的に区別する。 */
+.contact-form__checkbox-label a {
+  color: var(--color-cyan);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.contact-form__checkbox-label a:hover,
+.contact-form__checkbox-label a:focus-visible {
+  color: var(--color-accent);
+}
+
 .contact-form__checkbox {
   flex-shrink: 0;
   width: 20px;
@@ -437,6 +452,25 @@ textarea:focus-visible {
   width: auto;
   display: block;
 }
+.contact-footer__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+.contact-footer__privacy-link {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.contact-footer__privacy-link:hover,
+.contact-footer__privacy-link:focus-visible {
+  color: var(--color-accent);
+}
 .contact-footer__copy small {
   font-family: var(--font-sans);
   font-size: 0.62rem;
@@ -453,6 +487,9 @@ textarea:focus-visible {
   .contact-footer__brand {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  .contact-footer__copy {
+    align-items: center;
   }
 }
 

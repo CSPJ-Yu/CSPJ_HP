@@ -954,6 +954,28 @@ ul { list-style: none; }
   color: var(--color-text-muted);
 }
 
+.footer-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.footer-privacy-link {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--dur-fast) ease;
+}
+
+.footer-privacy-link:hover,
+.footer-privacy-link:focus-visible {
+  color: var(--color-accent);
+}
+
 .footer-copy small {
   font-family: var(--font-sans);
   font-size: 0.62rem;
@@ -1100,6 +1122,10 @@ ul { list-style: none; }
   .footer-brand {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .footer-copy {
+    align-items: center;
   }
 
   .sp-br { display: block; }

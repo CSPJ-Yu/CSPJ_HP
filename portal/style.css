@@ -481,6 +481,25 @@ button:focus-visible {
   width: auto;
   display: block;
 }
+.portal-footer__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+.portal-footer__privacy-link {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.portal-footer__privacy-link:hover,
+.portal-footer__privacy-link:focus-visible {
+  color: var(--color-accent);
+}
 .portal-footer__copy small,
 .portal-footer small {
   font-family: var(--font-sans);
@@ -498,6 +517,9 @@ button:focus-visible {
   .portal-footer__brand {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  .portal-footer__copy {
+    align-items: center;
   }
 }
 

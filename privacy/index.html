@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    /contact/ のお問い合わせフォームが現時点でバックエンド未接続(送信システム
+    準備中)であり、CSPJ内の他の制作中ページ(/portal/ /portal/dj/ /contact/)と
+    同様にnoindexとしている。Contact Formのバックエンド接続・本番公開が
+    確定した際に、他の制作中ページと合わせてnoindex解除を検討すること。
+    (この判断については完了報告で明示し、必要であれば方針を確認する)
+  -->
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Connect Spread PJ（CSPJ）のプライバシーポリシー。お問い合わせフォームで取得する情報の取り扱いについて説明します。">
+  <link rel="canonical" href="https://cs-pj.com/privacy/">
+  <title>Privacy Policy — Connect Spread PJ</title>
+
+  <link rel="icon" href="/images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+  <!--
+    /privacy/ はCSPJ共通ページとして、CSPJ本体(/index.html)・/portal/・
+    /contact/ とブランドトーン・Footerを統一しているが、CSSファイルとしては
+    /css/style.css を読み込まない完全に独立したページ(同方針)。個別DJサイト
+    (/dj/<slug>/)のデザインは使用していない。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/privacy/style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="privacy-header">
+    <div class="privacy-header__inner">
+      <a href="/" class="privacy-header__back" aria-label="Connect Spread PJ トップへ戻る">
+        <span aria-hidden="true">←</span> Connect Spread PJ
+      </a>
+      <span class="privacy-header__label">Privacy Policy</span>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="privacy-hero">
+      <div class="privacy-container">
+        <p class="privacy-hero__eyebrow">CSPJ — Legal</p>
+        <h1 class="privacy-hero__title">Privacy Policy</h1>
+        <p class="privacy-hero__subtitle">プライバシーポリシー</p>
+        <dl class="privacy-hero__dates">
+          <div class="privacy-hero__date-row">
+            <dt>制定日</dt>
+            <dd><time datetime="2026-09-05">2026年9月5日</time></dd>
+          </div>
+          <div class="privacy-hero__date-row">
+            <dt>最終改定日</dt>
+            <dd><time datetime="2026-09-05">2026年9月5日</time></dd>
+          </div>
+          <div class="privacy-hero__date-row">
+            <dt>バージョン</dt>
+            <dd>2026-09-05</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <article class="privacy-body">
+      <div class="privacy-container">
+
+        <p class="privacy-lead">
+          Connect Spread PJ（以下「CSPJ」といいます）は、本ウェブサイト
+          （<a href="https://cs-pj.com/">https://cs-pj.com/</a>、以下「本サイト」）における
+          お問い合わせ対応にあたり、取得する情報を本ポリシーに従って取り扱います。
+        </p>
+
+        <section class="privacy-section" aria-labelledby="p-01">
+          <h2 class="privacy-section__title" id="p-01">1. 基本方針</h2>
+          <p>
+            CSPJは、お問い合わせいただく方の個人情報を適切に取り扱うことが重要であると認識し、
+            個人情報の保護に関する法令その他の規範を遵守し、適切な取得・利用・管理に努めます。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-02">
+          <h2 class="privacy-section__title" id="p-02">2. 取得する情報</h2>
+          <p>本サイトの「お問い合わせフォーム」（<a href="/contact/">/contact/</a>）では、以下の情報をご入力いただきます。</p>
+          <ul class="privacy-list">
+            <li>氏名</li>
+            <li>メールアドレス</li>
+            <li>お問い合わせ種別</li>
+            <li>SNS / WebサイトURL（入力された場合のみ）</li>
+            <li>お問い合わせ内容</li>
+          </ul>
+          <p>
+            なお、本サイトはCloudflareの配信基盤を通じて公開されており、その性質上、
+            アクセス時のIPアドレス等の技術的情報がCloudflare側で処理される場合があります
+            （詳細は「5. 外部サービス・委託先」をご参照ください）。
+          </p>
+          <p>
+            <strong>現時点で、お問い合わせフォームに入力された内容を保存するサーバー側の仕組み自体が
+            未実装であり、送信された内容がCSPJ側のデータベース等に保存されることはありません。</strong>
+            将来、お問い合わせ内容を保存する仕組みを導入する際は、不正利用の防止等セキュリティ上の
+            目的でIPアドレス等の技術情報をあわせて記録する可能性があり、その場合は本ポリシーを
+            改定のうえ、あらためて明示します。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-03">
+          <h2 class="privacy-section__title" id="p-03">3. 個人情報の利用目的</h2>
+          <p>取得した情報は、以下の目的の範囲内で利用します。</p>
+          <ul class="privacy-list">
+            <li>お問い合わせへの回答</li>
+            <li>Webサイト制作、DJサイト制作、Visual / Flyer、Promotion、Event等に関するご相談への対応</li>
+            <li>お見積り、ご提案、契約に関するご連絡</li>
+            <li>サービス提供に必要なご連絡</li>
+            <li>不正利用、迷惑行為、スパム等への対応</li>
+            <li>お問い合わせ対応の品質改善</li>
+          </ul>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-04">
+          <h2 class="privacy-section__title" id="p-04">4. 第三者提供</h2>
+          <p>
+            CSPJは、法令に基づく場合を除き、あらかじめご本人の同意を得ることなく、取得した個人情報を
+            第三者に提供することはありません。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-05">
+          <h2 class="privacy-section__title" id="p-05">5. 外部サービス・委託先</h2>
+          <p>本サイトの運営にあたり、以下の外部サービスを利用しています。</p>
+          <ul class="privacy-list">
+            <li>
+              <strong>Cloudflare, Inc.（Cloudflare Pages）</strong> — 本サイトのWebサイト配信・
+              セキュリティのために利用しています。配信の性質上、アクセス時の通信に関する
+              技術的情報がCloudflare側で処理される場合があります。
+            </li>
+            <li>
+              <strong>Google Fonts（Google LLC）</strong> — 本サイトで使用するフォントの配信のために
+              利用しています。フォント読み込み時にGoogleのサーバーへアクセスが発生する場合があります。
+            </li>
+          </ul>
+          <p>
+            現時点で、お問い合わせフォームから送信された内容を保存・処理するバックエンドシステムは
+            稼働しておらず、個人情報の取り扱いを外部の受託事業者に委託する運用は行っていません。
+            将来、送信内容の保存やメール通知等のためにバックエンドシステム・外部サービスを導入する
+            場合は、本ポリシーを改定のうえ、利用するサービス名を明示します。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-06">
+          <h2 class="privacy-section__title" id="p-06">6. 個人情報の安全管理</h2>
+          <p>
+            CSPJは、取得した情報の漏えい、滅失又は毀損の防止その他の安全管理のために必要かつ
+            適切な措置を講じます。本サイトはHTTPSによる通信の暗号化に対応しています。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-07">
+          <h2 class="privacy-section__title" id="p-07">7. 保存期間・削除</h2>
+          <p>
+            前述のとおり、現時点でお問い合わせフォームの内容はサーバー側に保存されません。
+            将来、保存する仕組みを導入した場合は、お問い合わせ対応の完了後、合理的な期間内に
+            削除する等、適切な保存期間を定めます。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-08">
+          <h2 class="privacy-section__title" id="p-08">8. 開示・訂正・削除等の請求</h2>
+          <p>
+            ご自身の個人情報について、開示、訂正、利用停止、削除等をご希望される場合は、
+            「10. お問い合わせ窓口」までご連絡ください。ご本人確認のうえ、法令に従い
+            合理的な範囲で対応いたします。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-09">
+          <h2 class="privacy-section__title" id="p-09">9. 本ポリシーの変更</h2>
+          <p>
+            本ポリシーの内容は、法令の変更や本サイトの運用状況の変化に応じて、予告なく
+            変更することがあります。変更後のポリシーは、本ページに掲載した時点から
+            効力を生じるものとします。重要な変更を行った場合は、本ページ上部の
+            「最終改定日」を更新します。
+          </p>
+        </section>
+
+        <section class="privacy-section" aria-labelledby="p-10">
+          <h2 class="privacy-section__title" id="p-10">10. お問い合わせ窓口</h2>
+          <p>本ポリシーに関するお問い合わせ、または個人情報の開示等の請求は、以下の窓口までご連絡ください。</p>
+          <p class="privacy-contact-block">
+            Connect Spread PJ（CSPJ）<br>
+            お問い合わせフォーム: <a href="/contact/">https://cs-pj.com/contact/</a><br>
+            <span class="privacy-note">
+              （現在、フォームの送信システムは準備中です。お急ぎの場合は
+              <a href="https://www.instagram.com/cspj.official/" target="_blank" rel="noopener noreferrer">Instagram（@cspj.official）</a>
+              よりご連絡ください。）
+            </span>
+          </p>
+          <!--
+            TODO(CSPJ): 法人名・所在地・電話番号・代表者名等の法的表示は、
+            現時点でリポジトリ・既存公開情報から確認できないため未記載。
+            確定した情報が判明次第、追記すること。
+          -->
+        </section>
+
+      </div>
+    </article>
+  </main>
+
+  <!--
+    Footer — CSPJ共通Footer(cs-pj.comトップページの<footer class="footer">を
+    基準に統一。/portal/ /portal/dj/ /contact/ と同じ構成)。
+  -->
+  <footer class="privacy-footer" role="contentinfo">
+    <div class="privacy-container privacy-footer__inner">
+      <div class="privacy-footer__brand">
+        <span class="privacy-footer__logo-bg">
+          <img src="/images/logo_new.png" alt="Connect Spread PJ" class="privacy-footer__logo-img">
+        </span>
+      </div>
+      <div class="privacy-footer__copy">
+        <a href="/privacy/" class="privacy-footer__privacy-link">Privacy Policy</a>
+        <small>© 2024 Connect Spread PJ. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

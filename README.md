@@ -80,6 +80,22 @@ CSPJ共通ページ（/、/portal/、/portal/dj/、今後の /portal/event/ /por
 独立構成のままとし（無理に共通CSS化はしない）、Footerに必要なスタイルのみを各ページ側へ
 複製して反映する運用とする。
 
+### Contact / Privacy Policy(2026-09確定)
+
+```
+/contact/  → 実際の問い合わせフォーム(送信先バックエンド未接続。送信システム準備中)
+/privacy/  → プライバシーポリシー(制定日・最終改定日・バージョンを日付ベースで表示)
+```
+
+CSPJ共通ページのFooterには「Privacy Policy → /privacy/」の補助リンクを設置する
+（対象: `/`, `/portal/`, `/portal/dj/`, `/contact/`, `/privacy/`, `404.html`。個別DJサイト
+`/dj/<slug>/` には設置しない）。`/contact/`の同意チェックボックスは、実際の`/privacy/`への
+リンク付きで表示する。
+
+問い合わせフォームのバックエンド(`POST /api/contact`、D1保存、メール通知、Turnstile等)は
+未実装。実装が確定した際は、`/privacy/`の内容(取得する情報・外部サービス・保存期間等)を
+実態に合わせて改定すること。
+
 ---
 
 ## デザインコンセプト

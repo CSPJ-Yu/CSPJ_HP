@@ -352,6 +352,25 @@ a.djp-card:focus-visible {
   width: auto;
   display: block;
 }
+.djp-footer__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+.djp-footer__privacy-link {
+  font-family: var(--djp-font-sans);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--djp-color-text-muted);
+  transition: color var(--djp-dur-fast) var(--djp-ease-out);
+}
+.djp-footer__privacy-link:hover,
+.djp-footer__privacy-link:focus-visible {
+  color: var(--djp-color-accent);
+}
 .djp-footer__copy small,
 .djp-footer small {
   font-family: var(--djp-font-sans);
@@ -369,6 +388,9 @@ a.djp-card:focus-visible {
   .djp-footer__brand {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  .djp-footer__copy {
+    align-items: center;
   }
 }
 
