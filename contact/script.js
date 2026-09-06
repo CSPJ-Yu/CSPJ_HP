@@ -108,6 +108,13 @@ window.onTurnstileError = function () {
     other: 'other'
   };
 
+  // お問い合わせ内容の文字数範囲。api.CSPJ_HP側 src/lib/contact-validate.js の
+  // MESSAGE_MIN / MESSAGE_MAX(trim後10〜5000文字)と同じ値。ここが一致していないと、
+  // クライアント側は通過してもAPI側で400 Bad Requestになる(2026-09-06に実際に発生・
+  // 特定した不一致)。API側の値を変更した場合はここも合わせて更新すること。
+  var MESSAGE_MIN_LENGTH = 10;
+  var MESSAGE_MAX_LENGTH = 5000;
+
   // フィールドID → { required, validate(value) }。validateはtrueで合格。
   var fields = {
     name: {
@@ -194,6 +201,20 @@ window.onTurnstileError = function () {
 
       clearError(key);
     });
+
+    // お問い合わせ内容の文字数範囲チェック(API側と同じtrim後10〜5000文字)。
+    // 空文字の場合は上のforEachの必須チェックで既に処理済みのため、ここでは
+    // 「非空だが範囲外」の場合のみ扱う(必須エラーの文言を上書きしないため)。
+    var messageValue = fields.message.el.value.trim();
+    if (messageValue.length > 0) {
+      if (messageValue.length < MESSAGE_MIN_LENGTH) {
+        showError('message', 'お問い合わせ内容は10文字以上で入力してください。');
+        isValid = false;
+      } else if (messageValue.length > MESSAGE_MAX_LENGTH) {
+        showError('message', 'お問い合わせ内容は5000文字以内で入力してください。');
+        isValid = false;
+      }
+    }
 
     // SNS / Web URL(任意) — 入力があった場合のみ簡易URL形式チェック
     if (optionalUrlField) {
