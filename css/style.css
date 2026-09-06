@@ -263,6 +263,25 @@ ul { list-style: none; }
   border-color: var(--color-text-primary);
 }
 
+/* Portal: Start a Projectと同じボタン形状だが、テーマカラー(cyan)を使う専用配色。 */
+.nav-link--portal {
+  color: var(--color-cyan);
+  border: 1px solid var(--color-cyan);
+  padding: 0.5rem 1.25rem;
+  letter-spacing: 0.1em;
+  transition: border-color var(--dur-fast) ease,
+              color var(--dur-fast) ease,
+              background var(--dur-fast) ease;
+}
+
+.nav-link--portal::after { display: none; }
+
+.nav-link--portal:hover {
+  background: var(--color-cyan);
+  color: var(--color-bg);
+  border-color: var(--color-cyan);
+}
+
 /* Hamburger */
 .nav-toggle {
   display: none;
@@ -1018,6 +1037,10 @@ ul { list-style: none; }
 
   .nav-link--cta {
     margin-top: 1rem;
+    padding: 0.9rem 1.25rem; /* larger tap target on touch devices */
+  }
+
+  .nav-link--portal {
     padding: 0.9rem 1.25rem; /* larger tap target on touch devices */
   }
 
