@@ -102,9 +102,9 @@
     a.href = '/dj/' + encodeURIComponent(dj.slug) + '/';
 
     var photo = document.createElement('div');
-    photo.className = 'djp-card__photo djp-card__photo--placeholder';
-    photo.setAttribute('aria-hidden', 'true');
+    photo.className = 'djp-card__photo';
     a.appendChild(photo);
+    applyCardPhoto(photo, dj);
 
     var body = document.createElement('div');
     body.className = 'djp-card__body';
@@ -123,6 +123,46 @@
     a.appendChild(body);
 
     return a;
+  }
+
+  /**
+   * Portal Card画像(dj.portal_card_image_url)。
+   *   あり → <img>で実画像を表示(object-fit: coverはCSS側 .djp-card__photo-img)。
+   *   なし、または読み込み失敗(404/403/network error/broken image) →
+   *   CSPJ標準Placeholder(既存の.djp-card__photo--placeholderのグラデーション)に戻す。
+   *
+   * URL自体は profile-data.js 側で http/https以外・空文字を既に除外済みだが、
+   * 実際にブラウザで読み込めるか(404/403/ネットワークエラー等)はここでしか
+   * 判定できないため、<img>のerrorイベントで検知して安全にフォールバックする。
+   * URLはimg.srcへDOM APIで設定するのみで、innerHTMLへの文字列連結はしない
+   * (XSS対策)。
+   */
+  function applyCardPhoto(photoEl, dj) {
+    var url = dj.portal_card_image_url;
+    if (!url) {
+      setCardPhotoPlaceholder(photoEl);
+      return;
+    }
+
+    var img = document.createElement('img');
+    img.className = 'djp-card__photo-img';
+    img.alt = dj.display_name + ' artist image';
+    img.loading = 'lazy';
+    img.addEventListener('error', function () {
+      setCardPhotoPlaceholder(photoEl);
+    }, { once: true });
+    img.src = url;
+
+    photoEl.innerHTML = '';
+    photoEl.classList.remove('djp-card__photo--placeholder');
+    photoEl.removeAttribute('aria-hidden'); // 実画像は装飾ではないため
+    photoEl.appendChild(img);
+  }
+
+  function setCardPhotoPlaceholder(photoEl) {
+    photoEl.innerHTML = '';
+    photoEl.classList.add('djp-card__photo--placeholder');
+    photoEl.setAttribute('aria-hidden', 'true');
   }
 
   function renderComingSoonCard() {
@@ -174,7 +214,13 @@
         return CSPJProfile.fetchProfile(slug)
           .then(function (profile) {
             if (!profile || !profile.display_name) return null;
-            return { slug: profile.slug || slug, display_name: profile.display_name };
+            return {
+              slug: profile.slug || slug,
+              display_name: profile.display_name,
+              // Portal Card画像。未対応API・値なし・不正URLはprofile-data.js側で
+              // 既にnullに正規化済み(推測データを補完しない)。
+              portal_card_image_url: profile.portal_card_image_url || null,
+            };
           })
           .catch(function (err) {
             console.warn('[DJ Portal] ' + slug + ' の読み込みに失敗:', err.message);

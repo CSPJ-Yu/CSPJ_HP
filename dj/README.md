@@ -354,6 +354,53 @@ dj/shared/js/
 一覧取得endpointが公開API側に実装され次第、`dj-roster.js`の中身をそのAPI呼び出しに
 差し替えるだけでよく、`portal/dj/script.js`側の変更は不要な設計にしてある。
 
-DJの写真・ジャンル(Main/Sub Genre)はManage/D1/公開APIのいずれにも正式なデータが
-存在しないため、DJカードには表示していない(推測データをDJごとにハードコードしない
-方針)。Genre Filter UIも同じ理由で今回は実装していない。
+ジャンル(Main/Sub Genre)はManage/D1/公開APIのいずれにも正式なデータが存在しない
+ため、DJカードには表示していない(推測データをDJごとにハードコードしない方針)。
+Genre Filter UIも同じ理由で今回は実装していない。
+
+DJカードの写真(Portal Card画像)は2026-09にoptional対応済み。詳細は9-6章参照。
+
+### 9-6. Portal Card画像 + プラン連動仕様(2026-09追加)
+
+Portal Card画像は`/portal/dj/`のDJカード専用画像として、`portal_card_image_url`
+というフィールド名を前提に実装している(公開APIの命名に合わせる想定。現時点の
+実レスポンスにはまだこのフィールドが存在しない)。
+
+**データフロー**:
+```
+dj/shared/js/profile-data.js (CSPJProfile.fetchProfile)
+  → GET /v1/djs/:slug のレスポンスに portal_card_image_url が含まれていれば
+    そのまま返す(http/https以外・空文字は防御的にnullへ正規化)
+  → 存在しない場合は常に null(現状のAPIはこの状態)
+portal/dj/script.js (initDjList → renderDjCard → applyCardPhoto)
+  → null                    → CSPJ標準Placeholder(.djp-card__photo--placeholder)
+  → 値あり                   → <img>で実画像表示(object-fit: cover)
+  → 値はあるが読み込み失敗    → <img>のerrorイベントでPlaceholderへフォールバック
+    (404 / 403 / network error / 壊れたURL等、原因を問わず同じ扱い)
+```
+
+`portal_card_image_url`が存在しない・404等で読み込めない場合も例外にはならず、
+既存のCSPJ標準Placeholder(グラデーション)がそのまま表示される。**現在のYU-Xは
+API未対応のため常にPlaceholder表示であり、これは正常な状態。** API側に
+`portal_card_image_url`が追加された瞬間、コード変更なしにカードへ自動反映される
+設計にしてある。
+
+**プラン連動仕様(HP側の運用ルール。CSPJ_HP側でのプラン判定は実装しない)**:
+
+```
+Free Plan:
+  portal_card_imageを無料テンプレートのプロフィール画像として共通利用する
+  (Portal Card画像とHPプロフィール画像を別々には設定できない)
+
+Entry以上:
+  portal_card_imageはPortal専用。
+  個別サイト側の画像利用(どこに何を使うか)は商談・制作内容・テンプレート・
+  個別カスタマイズによって決定するため、CSPJ_HP側に profile_image / main_image /
+  hero_image 等の固定的な概念は追加しない。
+```
+
+プランの違いは「Freeテンプレート側がPortal Card画像を流用するかどうか」という
+HP側(Freeテンプレート実装時)の仕様で表現するものであり、`/portal/dj/`側では
+`free`/`entry`/`standard`等のプラン判定を一切行わない(Portal Card画像は
+全プラン共通で同じ仕組みで表示される)。Freeテンプレートの実装が確定した際は、
+この仕様を前提に`portal_card_image_url`を連携すること。
