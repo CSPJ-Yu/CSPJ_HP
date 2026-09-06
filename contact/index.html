@@ -27,7 +27,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/contact/style.css">
+  <!--
+    ?v=20260906 はキャッシュバスター(/css/style.css?v=2 等、CSPJ本体と同じ方針)。
+    /contact/style.css・/contact/script.js は Cache-Control: max-age=14400(4時間)
+    で配信されており、更新してもURLが同じだとブラウザキャッシュにより最大4時間
+    反映が遅れる。今後この2ファイルのどちらかを更新した際は、この値を当日の日付
+    (YYYYMMDD形式)等に更新すること。2つのURLの値は常に揃えておく必要はないが、
+    分かりやすさのため揃えている。
+  -->
+  <link rel="stylesheet" href="/contact/style.css?v=20260906">
 
   <!--
     Cloudflare Turnstile(ボット検証)。Site Keyは公開情報のためここに直接記載して
@@ -246,6 +254,7 @@
     </div>
   </footer>
 
-  <script src="/contact/script.js"></script>
+  <!-- ?v=20260906: 同上の理由でキャッシュバスターを付与。 -->
+  <script src="/contact/script.js?v=20260906"></script>
 </body>
 </html>
