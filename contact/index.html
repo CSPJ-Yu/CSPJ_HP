@@ -199,23 +199,31 @@
             </button>
           </div>
 
-          <!-- 成功時: フォームを非表示にしてこちらへ切り替える(script.js参照)。
-               201 Createdが返った場合のみ表示する(script.js参照)。 -->
-          <div class="contact-form__success" id="contactSuccess" role="status" aria-live="polite" hidden>
-            <p class="contact-form__success-title">Message Sent.</p>
-            <p class="contact-form__success-body">
-              お問い合わせいただきありがとうございます。内容を確認のうえ、
-              担当より折り返しご連絡いたします。
-            </p>
-          </div>
-
-          <!-- 送信エラー時。201以外の全レスポンス・通信エラーで表示する。
-               内部のエラー内容(ステータスコード等)はユーザーに表示しない。 -->
-          <div class="contact-form__error-banner" id="contactErrorBanner" role="alert" aria-live="assertive" hidden>
-            <p>送信中にエラーが発生しました。時間をおいて再度お試しください。</p>
-          </div>
-
         </form>
+
+        <!--
+          成功/失敗UIは意図的に<form>の外(兄弟要素)に置いている。<form>の内側に
+          置くと、成功時に form.hidden = true でフォームごとdisplay:noneになり、
+          子要素であるこれらの要素も(自身のhiddenを解除しても)一緒に非表示に
+          なってしまう不具合があったため(2026-09-06修正)。
+        -->
+
+        <!-- 成功時: フォームを非表示にしてこちらへ切り替える(script.js参照)。
+             201 Createdが返った場合のみ表示する(script.js参照)。 -->
+        <div class="contact-form__success" id="contactSuccess" role="status" aria-live="polite" hidden>
+          <p class="contact-form__success-title">Message Sent.</p>
+          <p class="contact-form__success-body">
+            お問い合わせいただきありがとうございます。内容を確認のうえ、
+            担当より折り返しご連絡いたします。
+          </p>
+        </div>
+
+        <!-- 送信エラー時。201以外の全レスポンス・通信エラーで表示する。
+             内部のエラー内容(ステータスコード等)はユーザーに表示しない。
+             フォーム自体は非表示にしない(再入力・再送信できるようにするため)。 -->
+        <div class="contact-form__error-banner" id="contactErrorBanner" role="alert" aria-live="assertive" hidden>
+          <p>送信中にエラーが発生しました。時間をおいて再度お試しください。</p>
+        </div>
       </div>
     </section>
   </main>
