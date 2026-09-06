@@ -44,14 +44,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
   <!--
-    ?v=20260906-3 はキャッシュバスター(/contact/style.css?v=20260906-3 等と同じ方針)。
+    ?v=20260906-4 はキャッシュバスター(/contact/style.css?v=20260906-4 等と同じ方針)。
     このページが読み込むCSS/JSは Cache-Control: max-age=14400(4時間)で配信され、
     URLが同じままだと更新してもブラウザキャッシュにより最大4時間反映が遅れる
     (実際にDJ Portal v1公開直後、この現象でYU-Xカードが表示されない事象が発生した
     ため対応)。今後この5ファイルのいずれかを更新した際は、この値を当日の日付
     (YYYYMMDD形式)等に更新すること。
   -->
-  <link rel="stylesheet" href="/portal/dj/style.css?v=20260906-3">
+  <link rel="stylesheet" href="/portal/dj/style.css?v=20260906-4">
 
   <!--
     DJ一覧の取得に、既存の /dj/shared/js/ (各DJページと共通のデータ取得層)を
@@ -61,9 +61,9 @@
               dj-roster.js(依存なし、順不同)
     詳細は /dj/README.md 参照。
   -->
-  <script src="/dj/shared/js/api-client.js?v=20260906-3"></script>
-  <script src="/dj/shared/js/profile-data.js?v=20260906-3"></script>
-  <script src="/dj/shared/js/dj-roster.js?v=20260906-3"></script>
+  <script src="/dj/shared/js/api-client.js?v=20260906-4"></script>
+  <script src="/dj/shared/js/profile-data.js?v=20260906-4"></script>
+  <script src="/dj/shared/js/dj-roster.js?v=20260906-4"></script>
 </head>
 <body class="djp">
 
@@ -169,7 +169,7 @@
     </div>
   </footer>
 
-  <!-- ?v=20260906-3: 同上の理由でキャッシュバスターを付与。 -->
-  <script src="/portal/dj/script.js?v=20260906-3"></script>
+  <!-- ?v=20260906-4: 同上の理由でキャッシュバスターを付与。 -->
+  <script src="/portal/dj/script.js?v=20260906-4"></script>
 </body>
 </html>

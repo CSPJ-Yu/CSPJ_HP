@@ -380,10 +380,25 @@ portal/dj/script.js (initDjList → renderDjCard → applyCardPhoto)
 ```
 
 `portal_card_image_url`が存在しない・404等で読み込めない場合も例外にはならず、
-既存のCSPJ標準Placeholder(グラデーション)がそのまま表示される。**現在のYU-Xは
-API未対応のため常にPlaceholder表示であり、これは正常な状態。** API側に
+既存のCSPJ標準Placeholder(グラデーション)がそのまま表示される。API側に
 `portal_card_image_url`が追加された瞬間、コード変更なしにカードへ自動反映される
-設計にしてある。
+設計にしてある。**2026-09、YU-Xの実データにも`portal_card_image_url`が追加され、
+本番で実画像表示が確認できている。**
+
+**画像の比率・推奨サイズ(2026-09確定。4:3から3:4へ変更)**:
+
+```
+比率:     3:4(縦)
+推奨サイズ: 1200 × 1600px
+最低目安:  900 × 1200px
+表示:     object-fit: cover; object-position: center;
+```
+
+Portal Cardの画像領域(`.djp-card__photo`)は`aspect-ratio: 3 / 4`で固定しており、
+実画像・Placeholderのどちらでも同じ比率になる(表示状態によってカードの高さが
+変わらない)。3:4以外の比率の画像を登録した場合も`object-fit: cover`で3:4枠に
+自然にトリミングされるが、不要なcropを避けるため、登録時点で3:4に近い縦長画像を
+用意することを推奨する。
 
 **プラン連動仕様(HP側の運用ルール。CSPJ_HP側でのプラン判定は実装しない)**:
 
@@ -403,4 +418,4 @@ Entry以上:
 HP側(Freeテンプレート実装時)の仕様で表現するものであり、`/portal/dj/`側では
 `free`/`entry`/`standard`等のプラン判定を一切行わない(Portal Card画像は
 全プラン共通で同じ仕組みで表示される)。Freeテンプレートの実装が確定した際は、
-この仕様を前提に`portal_card_image_url`を連携すること。
+この仕様(および上記の3:4という比率)を前提に`portal_card_image_url`を連携すること。

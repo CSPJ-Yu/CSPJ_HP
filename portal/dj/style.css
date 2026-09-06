@@ -316,9 +316,11 @@ a.djp-card:focus-visible {
   background: var(--djp-color-surface);
 }
 
+/* 3:4(縦)。実画像・Placeholderとも同じ比率を共有するため、どちらの状態でも
+   カードの高さが変わらない(2026-09、4:3から変更)。 */
 .djp-card__photo {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   background: linear-gradient(135deg, #1e1e1e 0%, #2a2826 50%, #1a1a18 100%);
 }
