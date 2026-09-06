@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!--
-    送信先バックエンドAPI(POST /api/contact 等)がまだ確定・実装されていないため、
-    本番公開はまだ行わない。フォームUI・バリデーション・成功/失敗表示の土台のみ
-    完成させている段階(詳細はscript.js冒頭のコメント参照)。バックエンド接続・
-    最終確認後にnoindexを解除すること。
+    2026-09-06: 送信先バックエンドAPI(POST https://api.cs-pj.com/v1/contact)へ接続済み。
+    Cloudflare Turnstileによるボット検証 → API検証 → D1保存の本番フローが稼働している
+    (詳細はscript.js冒頭のコメント参照)。noindexは本タスクの指示により今回は変更せず
+    維持している(SEO公開の可否は別途ユーザーへ確認のうえ判断する)。
   -->
   <meta name="robots" content="noindex">
   <meta name="description" content="Connect Spread PJ（CSPJ）へのお問い合わせページ。Web制作・DJサイト制作・Visual/Flyer・Promotion・Eventなど、お気軽にご相談ください。">
@@ -28,6 +28,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/contact/style.css">
+
+  <!--
+    Cloudflare Turnstile(ボット検証)。Site Keyは公開情報のためここに直接記載して
+    問題ない。対応するSecret KeyはAPI側(api.CSPJ_HP)のCloudflare Worker Secretとして
+    のみ管理されており、このリポジトリには一切含めていない。
+  -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -59,10 +66,10 @@
         <h2 class="contact-form-heading sr-only" id="contact-form-heading">Contact Form</h2>
 
         <!--
-          フォーム本体。送信先API(POST /api/contact)は未確定のため、script.js側で
-          実際のfetch()は行っていない(バリデーション成功後、Turnstile検証・D1保存・
-          メール通知が確定次第、接続する想定)。この状態で送信されたと誤解されない
-          よう、成功時メッセージは「準備中」であることを正直に明示している。
+          フォーム本体。クライアント側バリデーション通過後、Cloudflare Turnstileの
+          トークンを含めて POST https://api.cs-pj.com/v1/contact へ送信する(script.js
+          参照)。レスポンスが201の場合のみ成功UIを表示し、それ以外(4xx/5xx/通信エラー)は
+          内部エラーの詳細を出さない汎用エラーメッセージ(#contactErrorBanner)を表示する。
         -->
         <form class="contact-form" id="contactForm" novalidate>
 
@@ -168,6 +175,23 @@
             <p class="contact-form__error" id="error-privacy" role="alert"></p>
           </div>
 
+          <!--
+            Cloudflare Turnstile(暗黙レンダリング)。data-callback等はscript.js側で
+            windowに定義したグローバル関数を参照する(Turnstile公式の実装方式)。
+            Site Keyは公開情報。
+          -->
+          <div class="contact-form__row contact-form__row--turnstile">
+            <div
+              class="cf-turnstile"
+              id="contactTurnstile"
+              data-sitekey="0x4AAAAAAEpgwKCT1tqMHQVm"
+              data-theme="dark"
+              data-callback="onTurnstileSuccess"
+              data-expired-callback="onTurnstileExpired"
+              data-error-callback="onTurnstileError"></div>
+            <p class="contact-form__error" id="error-turnstile" role="alert"></p>
+          </div>
+
           <div class="contact-form__submit-wrap">
             <button type="submit" class="contact-form__submit" id="contactSubmit">
               <span class="contact-form__submit-text">Send Message</span>
@@ -175,18 +199,18 @@
             </button>
           </div>
 
-          <!-- 成功時: フォームを非表示にしてこちらへ切り替える(script.js参照) -->
+          <!-- 成功時: フォームを非表示にしてこちらへ切り替える(script.js参照)。
+               201 Createdが返った場合のみ表示する(script.js参照)。 -->
           <div class="contact-form__success" id="contactSuccess" role="status" aria-live="polite" hidden>
-            <p class="contact-form__success-title">ご入力ありがとうございます。</p>
+            <p class="contact-form__success-title">Message Sent.</p>
             <p class="contact-form__success-body">
-              現在、送信システムを準備中のため、恐れ入りますが今回のご入力内容は
-              まだ送信されておりません。お急ぎの場合は
-              <a href="https://www.instagram.com/cspj.official/" target="_blank" rel="noopener noreferrer">Instagram(@cspj.official)</a>
-              よりご連絡ください。
+              お問い合わせいただきありがとうございます。内容を確認のうえ、
+              担当より折り返しご連絡いたします。
             </p>
           </div>
 
-          <!-- 送信エラー時(将来API接続後、通信失敗時に表示する想定の土台) -->
+          <!-- 送信エラー時。201以外の全レスポンス・通信エラーで表示する。
+               内部のエラー内容(ステータスコード等)はユーザーに表示しない。 -->
           <div class="contact-form__error-banner" id="contactErrorBanner" role="alert" aria-live="assertive" hidden>
             <p>送信中にエラーが発生しました。時間をおいて再度お試しください。</p>
           </div>

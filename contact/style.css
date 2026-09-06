@@ -298,6 +298,17 @@ textarea:focus-visible {
   border-bottom: none;
 }
 
+.contact-form__row--turnstile {
+  border-bottom: none;
+}
+
+/* Turnstileウィジェット(iframe)の幅は約300pxで、320px幅の画面でも収まるが、
+   念のためコンテナ側で横スクロールが出ないようにしておく。 */
+.contact-form__row--turnstile .cf-turnstile {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .contact-form__checkbox-label {
   display: flex;
   align-items: flex-start;

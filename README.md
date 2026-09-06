@@ -92,9 +92,23 @@ CSPJ共通ページのFooterには「Privacy Policy → /privacy/」の補助リ
 `/dj/<slug>/` には設置しない）。`/contact/`の同意チェックボックスは、実際の`/privacy/`への
 リンク付きで表示する。
 
-問い合わせフォームのバックエンド(`POST /api/contact`、D1保存、メール通知、Turnstile等)は
-未実装。実装が確定した際は、`/privacy/`の内容(取得する情報・外部サービス・保存期間等)を
-実態に合わせて改定すること。
+問い合わせフォームのバックエンドは2026-09-06に本番接続済み。
+
+```
+Contact Form (/contact/)
+  ↓ Cloudflare Turnstileでボット検証(Site Keyのみ/contact/index.htmlに記載)
+  ↓ POST https://api.cs-pj.com/v1/contact (別リポジトリ api.CSPJ_HP)
+  ↓ API側でTurnstile再検証 → Cloudflare D1へ保存
+  ↓ 201 Createdのみ成功UI表示。それ以外は汎用エラーメッセージのみ表示
+```
+
+Turnstile Secret Keyは`api.CSPJ_HP`側のCloudflare Worker Secretとしてのみ管理し、
+本リポジトリ(`CSPJ_HP`)には絶対に置かないこと。`/v1/contact`のCORSは
+`https://cs-pj.com`のみを許可する設定で本番稼働済み(本リポジトリ側での対応は不要)。
+
+バックエンド接続に伴い、`/privacy/`の「2. 取得する情報」「5. 外部サービス・委託先」
+「7. 保存期間・削除」「10. お問い合わせ窓口」を実態に合わせて改定済み(制定日・
+最終改定日・バージョンは2026-09-05のまま。バージョンを上げるかは別途要検討)。
 
 ---
 

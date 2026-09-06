@@ -3,24 +3,59 @@
  * 完全に独立したスクリプトです。CSPJ本体・DJポータル・各DJページ・/portal/の
  * JSとは無関係に動作します。
  *
- * 現状の役割:
+ * 役割:
  *   1. 控えめなscroll reveal
  *   2. お問い合わせフォームのクライアント側バリデーション・
  *      成功/失敗表示の切り替え・二重送信防止
+ *   3. Cloudflare Turnstile(ボット検証)の結果取得
+ *   4. POST https://api.cs-pj.com/v1/contact への本番送信
  *
- * 重要(送信処理について):
- *   送信先バックエンドAPI(POST /api/contact 等、Turnstile検証・D1保存・
- *   CSPJへのメール通知を想定)はまだ確定・実装されていない。存在しない
- *   endpointを推測してfetch()することはしていない。
+ * 送信フロー(2026-09-06接続):
+ *   Turnstileウィジェットが検証を完了するとwindow.onTurnstileSuccess()が
+ *   呼ばれ、取得したトークンをturnstileTokenに保持する。フォーム送信時、
+ *   クライアント側バリデーション + Turnstileトークンの存在確認の両方を
+ *   通過した場合のみ、実際のAPIへfetch()する。
  *
- *   そのため、バリデーションがすべて通った場合でも実際にはどこにも送信されず、
- *   index.html に書かれた正直な文言(「現在、送信システムを準備中のため
- *   まだ送信されておりません」)を表示するだけに留めている。
- *   将来バックエンドが確定したら、submitContactForm() の中身を実際の
- *   fetch('/api/contact', ...) 呼び出しに差し替えること
- *   (バリデーション・UI状態管理の呼び出し側は変更不要な設計にしてある)。
+ *   レスポンスが201 Createdの場合のみ成功UIを表示する。それ以外の
+ *   ステータス・通信エラーはすべて同じ汎用エラーメッセージを表示し、
+ *   ステータスコードやエラー内容など内部情報はユーザーへ一切表示しない。
+ *
+ *   Turnstileのトークンは一度検証に使うと再利用できない(ワンタイム)ため、
+ *   成功・失敗を問わず送信試行のたびにturnstile.reset()でウィジェットを
+ *   リセットし、次回送信時は必ず新しいトークンを要求する。
+ *
+ *   クライアント側バリデーションはあくまでUXのためのものであり、
+ *   セキュリティ境界はAPI側(Turnstile検証・サーバー側バリデーション)に
+ *   ある。ここでのチェックを迂回されても、API側で弾かれる想定。
+ *
+ *   Secret Keyはこのファイル・このリポジトリのどこにも含まれていない
+ *   (api.CSPJ_HP側のCloudflare Worker Secretとしてのみ管理される)。
  */
 'use strict';
+
+// Cloudflare Turnstileの検証結果トークン。ウィジェットのcallbackから設定される。
+// data-callback等のHTML属性からグローバル関数として参照されるため、
+// IIFEの外(モジュールトップレベル)で保持する。
+var turnstileToken = '';
+
+// data-callback="onTurnstileSuccess" 等はTurnstileが window.onTurnstileSuccess
+// をグローバル関数として呼び出す仕様のため、windowに明示的に生やす。
+window.onTurnstileSuccess = function (token) {
+  turnstileToken = token || '';
+  var errorEl = document.getElementById('error-turnstile');
+  var widget = document.getElementById('contactTurnstile');
+  var row = widget ? widget.closest('.contact-form__row') : null;
+  if (errorEl) errorEl.textContent = '';
+  if (row) row.classList.remove('contact-form__row--invalid');
+};
+
+window.onTurnstileExpired = function () {
+  turnstileToken = '';
+};
+
+window.onTurnstileError = function () {
+  turnstileToken = '';
+};
 
 (function initReveal() {
   var targets = document.querySelectorAll('.reveal-fade, .reveal-up');
@@ -54,6 +89,24 @@
   var successBox = document.getElementById('contactSuccess');
   var errorBanner = document.getElementById('contactErrorBanner');
   var isSubmitting = false;
+
+  var CONTACT_API_URL = 'https://api.cs-pj.com/v1/contact';
+
+  // /privacy/ の現在のバージョン(privacy/index.html の <dl class="privacy-hero__dates">
+  // と同じ値)。/privacy/ を改定してバージョンを上げた場合は、ここも同じ値に
+  // 合わせて更新すること。
+  var PRIVACY_POLICY_VERSION = '2026-09-05';
+
+  // フォーム側の表示用value → API側が受け付けるcategory値へのマッピング。
+  // 表示用のvalue(html側)は変更せず、送信直前にAPI仕様へ変換する。
+  var CATEGORY_MAP = {
+    web: 'web_site',
+    dj: 'dj_site',
+    visual: 'visual_flyer',
+    promotion: 'promotion',
+    event: 'event',
+    other: 'other'
+  };
 
   // フィールドID → { required, validate(value) }。validateはtrueで合格。
   var fields = {
@@ -160,24 +213,51 @@
     return isValid;
   }
 
-  // 現時点でのダミー送信処理。バックエンド確定後、ここを実際の
-  // fetch('/api/contact', { method:'POST', body: JSON.stringify(data) }) 等に
-  // 差し替える(呼び出し側のvalidate()・UI切り替えロジックは変更不要)。
-  function submitContactForm(data) {
-    return new Promise(function (resolve) {
-      setTimeout(function () { resolve({ ok: true }); }, 500);
-    });
+  // Turnstileの検証結果を確認する。他フィールドと同じ表示スタイル
+  // (.contact-form__error / .contact-form__row--invalid)を再利用する。
+  function validateTurnstile() {
+    var errorEl = document.getElementById('error-turnstile');
+    var widget = document.getElementById('contactTurnstile');
+    var row = widget ? widget.closest('.contact-form__row') : null;
+
+    if (!turnstileToken) {
+      if (errorEl) errorEl.textContent = '認証を完了してください。';
+      if (row) row.classList.add('contact-form__row--invalid');
+      return false;
+    }
+
+    if (errorEl) errorEl.textContent = '';
+    if (row) row.classList.remove('contact-form__row--invalid');
+    return true;
   }
 
-  function getFormData() {
+  function getApiPayload() {
+    var snsUrl = optionalUrlField ? optionalUrlField.value.trim() : '';
+    var inquiryType = fields['inquiry-type'].el.value;
+
     return {
       name: fields.name.el.value.trim(),
       email: fields.email.el.value.trim(),
-      inquiry_type: fields['inquiry-type'].el.value,
-      sns_url: optionalUrlField ? optionalUrlField.value.trim() : '',
+      category: CATEGORY_MAP[inquiryType] || inquiryType,
+      sns_url: snsUrl || null,
       message: fields.message.el.value.trim(),
-      privacy: fields.privacy.el.checked,
+      privacy_consent: fields.privacy.el.checked,
+      privacy_policy_version: PRIVACY_POLICY_VERSION,
+      turnstile_token: turnstileToken,
     };
+  }
+
+  // 本番API呼び出し。201 Createdの場合のみ ok:true を返す。
+  // レスポンスの内容(エラーメッセージ等)は呼び出し元(送信ハンドラ)へは
+  // 渡さない — ユーザーへ内部情報を表示しないため、ここでステータスのみ判定する。
+  function submitContactForm(payload) {
+    return fetch(CONTACT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then(function (response) {
+      return { ok: response.status === 201 };
+    });
   }
 
   form.addEventListener('submit', function (e) {
@@ -186,9 +266,15 @@
 
     if (errorBanner) errorBanner.hidden = true;
 
-    if (!validate()) {
-      // 最初のエラー項目にフォーカスを移す
-      var firstInvalid = form.querySelector('.contact-form__row--invalid .contact-form__input, .contact-form__row--invalid .contact-form__checkbox');
+    var fieldsValid = validate();
+    var turnstileValid = validateTurnstile();
+
+    if (!fieldsValid || !turnstileValid) {
+      // 最初のエラー項目にフォーカスを移す(Turnstileウィジェット自体は
+      // フォーカス不可のため、フィールドの入力エラーを優先する)
+      var firstInvalid = form.querySelector(
+        '.contact-form__row--invalid .contact-form__input, .contact-form__row--invalid .contact-form__checkbox'
+      );
       if (firstInvalid) firstInvalid.focus();
       return;
     }
@@ -198,7 +284,7 @@
     var originalText = submitBtn.querySelector('.contact-form__submit-text').textContent;
     submitBtn.querySelector('.contact-form__submit-text').textContent = 'Sending...';
 
-    submitContactForm(getFormData())
+    submitContactForm(getApiPayload())
       .then(function (result) {
         if (!result || !result.ok) throw new Error('submit failed');
         form.hidden = true;
@@ -208,8 +294,8 @@
         }
       })
       .catch(function () {
-        // 現状のダミー実装では発生しないが、将来の実API接続時のための土台。
-        // 内部エラーの詳細はユーザーへ表示しない。
+        // 4xx/5xx・通信エラーいずれもここに到達する。内部エラーの詳細は
+        // ユーザーへ表示しない(汎用メッセージのみ)。
         if (errorBanner) {
           errorBanner.hidden = false;
           errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -219,6 +305,13 @@
         isSubmitting = false;
         submitBtn.disabled = false;
         submitBtn.querySelector('.contact-form__submit-text').textContent = originalText;
+
+        // Turnstileのトークンはワンタイムのため、成功・失敗を問わず
+        // 送信試行のたびにリセットし、次回は必ず新しいトークンを要求する。
+        if (typeof turnstile !== 'undefined' && typeof turnstile.reset === 'function') {
+          turnstile.reset();
+        }
+        turnstileToken = '';
       });
   });
 })();
