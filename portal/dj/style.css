@@ -283,21 +283,22 @@ button:focus-visible {
   color: var(--djp-color-text-primary);
 }
 
+/* 列数: 〜639px=2列 / 640〜1023px=3列 / 1024px〜=4列(2026-09調整)。 */
 .djp-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1px;
   background: var(--djp-color-border);
   border: 1px solid var(--djp-color-border);
 }
 @media (min-width: 640px) {
   .djp-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 @media (min-width: 1024px) {
   .djp-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -392,6 +393,28 @@ a.djp-card:focus-visible {
 .djp-card--placeholder .djp-card__genre,
 .djp-card--placeholder .djp-card__desc {
   color: var(--djp-color-text-muted);
+}
+
+/* ─── 375〜639px(2列表示)専用の縮小調整 ───────────────
+   列数が2列になる分、1カラムあたりの幅が狭くなるため、DJ名が不自然に
+   詰まったり、CTAがはみ出したりしないよう、指定された4項目(padding /
+   DJ名font-size / CTA font-size / gap)だけを控えめに縮小する。カードの
+   構成・配色・比率(photo aspect-ratio 4/3等)自体は変更しない
+   (ブランドデザインは維持)。min-height(タップ領域)は変更しない。
+   Next Artist/Coming Soonカードも同じクラスを使うため、ここで自動的に
+   同じサイズに揃う。 */
+@media (max-width: 639px) {
+  .djp-card__body {
+    padding: 0.9rem;
+    gap: 0.4rem;
+  }
+  .djp-card__name {
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
+  .djp-card__link {
+    font-size: 0.62rem;
+  }
 }
 
 /* ============================================================
