@@ -9,7 +9,21 @@
     noindexを維持する。正式公開はPortal全体でまとめて判断する。
   -->
   <meta name="robots" content="noindex">
-  <meta name="description" content="Connect Spread PJ（CSPJ）が制作・運営するDJ公式サイトのポータル。所属・提携DJそれぞれの個別サイトへのリンクを掲載しています。">
+  <meta name="description" content="Connect Spread PJ（CSPJ）が制作・運営するDJ公式サイトのポータル。DJを検索・発見し、それぞれの個別サイトへアクセスできます。">
+  <link rel="canonical" href="https://cs-pj.com/portal/dj/">
+  <meta property="og:title" content="DJ Portal — Connect Spread PJ">
+  <meta property="og:description" content="Connect Spread PJ（CSPJ）が制作・運営するDJ公式サイトのポータル。DJを検索・発見し、それぞれの個別サイトへアクセスできます。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Connect Spread PJ">
+  <meta property="og:url" content="https://cs-pj.com/portal/dj/">
+  <meta property="og:image" content="https://cs-pj.com/images/ogp/ogp-default.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DJ Portal — Connect Spread PJ">
+  <meta name="twitter:description" content="Connect Spread PJ（CSPJ）が制作・運営するDJ公式サイトのポータル。DJを検索・発見し、それぞれの個別サイトへアクセスできます。">
+  <meta name="twitter:image" content="https://cs-pj.com/images/ogp/ogp-default.jpg">
   <title>DJ Portal — Connect Spread PJ</title>
 
   <link rel="icon" href="/images/favicon.ico" sizes="any">
@@ -30,6 +44,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/portal/dj/style.css">
+
+  <!--
+    DJ一覧の取得に、既存の /dj/shared/js/ (各DJページと共通のデータ取得層)を
+    再利用する。HTML/CSS/DOM生成を持たない純粋なデータ取得モジュールのため、
+    /dj/<slug>/ 以外のページ(このPortal)から読み込んでも問題ない。
+    読み込み順: api-client.js → profile-data.js(APIクライアントに依存) /
+              dj-roster.js(依存なし、順不同)
+    詳細は /dj/README.md 参照。
+  -->
+  <script src="/dj/shared/js/api-client.js"></script>
+  <script src="/dj/shared/js/profile-data.js"></script>
+  <script src="/dj/shared/js/dj-roster.js"></script>
 </head>
 <body class="djp">
 
@@ -59,6 +85,28 @@
       </div>
     </section>
 
+    <!-- ============ DJ Search ============
+         Genre Filter(ジャンル絞り込み)は今回のv1では未実装。理由: Manage/D1/
+         公開APIのいずれにも正式なGenreデータがまだ存在しないため(推測データを
+         DJごとにハードコードしない方針)。データが揃い次第、このsection内に
+         フィルタUIを追加できる構造にしてある(詳細はdj/README.md参照)。
+    -->
+    <section class="djp-search" aria-label="DJを検索">
+      <div class="djp-container">
+        <p class="djp-search__tagline reveal-fade">Find your next sound.</p>
+        <div class="djp-search__bar reveal-up">
+          <span class="djp-search__icon" aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            id="djSearchInput"
+            class="djp-search__input"
+            placeholder="Search DJs..."
+            aria-label="DJ名で検索"
+            autocomplete="off">
+        </div>
+      </div>
+    </section>
+
     <!-- ============ Artist Grid ============ -->
     <section class="djp-list" aria-labelledby="djp-list-heading">
       <div class="djp-container">
@@ -68,45 +116,23 @@
         </div>
 
         <!--
-          将来、CSPJ公開APIからDJ一覧を取得して自動生成する可能性がある
-          コンテナ(data-dj-grid)。今回は存在しないAPIを推測実装せず、
-          静的なカードのみを配置している。API対応時もこのコンテナの
-          構造・クラス名はそのまま利用できる想定。
+          DJ一覧は公開API(GET /v1/djs/:slug、dj/shared/js/profile-data.js経由)から
+          取得した display_name のみで構成する(script.js の initDjList() が担当)。
 
-          カード構造は「PHOTO / DJ NAME / GENRE / VIEW ARTIST →」の順。
-          写真・ジャンル・プロフィール文などDJ本人から未提供の情報は
-          推測で作成していない(sample以外のDJカードは今回追加していない)。
+          【重要・現状のAPI制約】公開APIには「DJ一覧」を返すendpointがまだ存在しない
+          (2026-09時点でGET /v1/djsは404であることを確認済み)。そのため「どのslugが
+          存在するか」だけは /dj/shared/js/dj-roster.js の暫定的な静的配列で管理し、
+          各slugの実際のコンテンツ(表示名)は公開APIから取得する。DJの写真・ジャンルは
+          公開APIにデータが存在しないため、今回は表示しない(推測で追加していない)。
+          一覧取得endpointが実装され次第、dj-roster.js側だけを差し替えればよい。
+
+          data-dj-grid: script.jsが描画するコンテナ。data-dj-loading /
+          data-dj-empty はそれぞれ読み込み中 / 該当DJ0件(検索絞り込み後を含む)の
+          状態表示。/dj/sample/ は技術サンプルのため、この一覧には含めない。
         -->
-        <div class="djp-grid" data-dj-grid>
-
-          <!-- Sample artist card(技術サンプル。/dj/sample/ 参照) -->
-          <a href="/dj/sample/" class="djp-card reveal-up">
-            <div class="djp-card__photo djp-card__photo--placeholder" aria-hidden="true"></div>
-            <div class="djp-card__body">
-              <h3 class="djp-card__name">DJ SAMPLE</h3>
-              <span class="djp-card__genre">Sample</span>
-              <p class="djp-card__desc">独立したCSS・JSで動作するアーティストサイトのサンプルページです。</p>
-              <span class="djp-card__link">VIEW ARTIST <span aria-hidden="true">→</span></span>
-            </div>
-          </a>
-
-          <!--
-            YU-Xについて: /dj/yu-x/ は現在制作中(noindex)のため、
-            一般公開導線としてのカードは今回追加していない。
-            公開判断は既存のnoindex状態を変更するタイミングで別途行う。
-          -->
-
-          <!-- 今後、DJが追加されるとここにカードが並びます -->
-          <div class="djp-card djp-card--placeholder reveal-up" aria-hidden="true">
-            <div class="djp-card__photo"></div>
-            <div class="djp-card__body">
-              <h3 class="djp-card__name">Next Artist</h3>
-              <span class="djp-card__genre">Coming Soon</span>
-              <p class="djp-card__desc">今後、こちらに新しいDJサイトが追加されていきます。</p>
-            </div>
-          </div>
-
-        </div>
+        <p class="djp-status" data-dj-loading>Loading…</p>
+        <p class="djp-status" data-dj-empty hidden>該当するDJが見つかりませんでした。</p>
+        <div class="djp-grid" data-dj-grid hidden></div>
       </div>
     </section>
   </main>

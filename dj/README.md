@@ -329,8 +329,31 @@ dj/shared/js/
 ├─ schedule-data.js … ✅Events実装済み(API/CSV両対応)。fetchEvents()の名称・返却形式は維持
 ├─ news-data.js     … ✅実装済み。GET /v1/djs/:slug/news
 ├─ social-data.js   … ✅実装済み。GET /v1/djs/:slug/social-links
-└─ popup-data.js    … ✅実装済み。GET /v1/djs/:slug/popup
+├─ popup-data.js    … ✅実装済み。GET /v1/djs/:slug/popup
+└─ dj-roster.js     … ✅実装済み(2026-09、DJ Portal v1で追加)。既知DJのslug一覧
+                       (暫定の静的配列。9-5章参照)
 ```
 
 各DJ固有の`script.js`は描画・UI制御のみを担当し、共有モジュール側はデータ取得・共通処理のみを
 担当する、という現行の責務分離の考え方をそのまま踏襲しています。
+
+### 9-5. DJ Portal(`/portal/dj/`)からの利用(2026-09追加)
+
+`/portal/dj/`(DJ検索・発見ページ)も、各DJページと同じ`dj/shared/js/api-client.js` /
+`profile-data.js`を読み込んで再利用している(HTML/CSS/DOM生成を持たない純粋な
+データ取得層のため、`/dj/<slug>/`以外のページから読み込んでも問題ない)。
+
+**現状のAPI制約**: 公開APIには「DJ一覧」を返すendpoint(例: `GET /v1/djs`)が
+2026-09時点で存在しない(実際にリクエストし404であることを確認済み)。そのため、
+「どのDJが存在するか」というslug一覧だけは`dj/shared/js/dj-roster.js`
+(`CSPJDjRoster.listKnownSlugs()`)の暫定的な静的配列で管理し、各slugの実際の
+コンテンツ(表示名)は`profile-data.js`経由で公開APIから取得する。新しいDJサイトを
+追加した際は、`dj-roster.js`の配列にもslugを追加すること(現状はこれが唯一の
+登録箇所)。`/dj/sample/`は技術サンプルのため、この一覧には含めていない。
+
+一覧取得endpointが公開API側に実装され次第、`dj-roster.js`の中身をそのAPI呼び出しに
+差し替えるだけでよく、`portal/dj/script.js`側の変更は不要な設計にしてある。
+
+DJの写真・ジャンル(Main/Sub Genre)はManage/D1/公開APIのいずれにも正式なデータが
+存在しないため、DJカードには表示していない(推測データをDJごとにハードコードしない
+方針)。Genre Filter UIも同じ理由で今回は実装していない。

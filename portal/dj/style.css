@@ -194,6 +194,70 @@ button:focus-visible {
 }
 
 /* ============================================================
+   DJ Search
+   ============================================================ */
+.djp-search {
+  padding: 0 0 clamp(2.5rem, 6vw, 4rem);
+}
+.djp-search__tagline {
+  font-family: var(--djp-font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  color: var(--djp-color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+.djp-search__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 36rem;
+  padding: 0.9rem 1.25rem;
+  border: 1px solid var(--djp-color-border-light);
+  background: var(--djp-color-surface);
+  transition: border-color var(--djp-dur-fast) var(--djp-ease-out);
+}
+.djp-search__bar:focus-within {
+  border-color: var(--djp-color-cyan);
+}
+.djp-search__icon {
+  font-size: 1rem;
+  color: var(--djp-color-text-muted);
+  line-height: 1;
+}
+.djp-search__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--djp-color-text-primary);
+  font-family: var(--djp-font-sans);
+  font-size: 0.95rem;
+  font-weight: 300;
+  min-height: 28px;
+}
+.djp-search__input::placeholder {
+  color: var(--djp-color-text-muted);
+  font-weight: 300;
+}
+/* ネイティブのsearch input用クリアボタン(×)をブランドの色調に近づける */
+.djp-search__input::-webkit-search-cancel-button {
+  filter: grayscale(1) opacity(0.6);
+}
+
+/* ============================================================
+   DJ一覧の状態表示(読み込み中 / 該当なし・読み込み失敗)
+   ============================================================ */
+.djp-status {
+  font-family: var(--djp-font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--djp-color-text-muted);
+  padding: 1.5rem 0;
+}
+
+/* ============================================================
    Artist Grid
    ============================================================ */
 .djp-list {
