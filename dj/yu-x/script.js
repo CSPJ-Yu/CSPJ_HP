@@ -64,6 +64,34 @@
 })();
 
 /* ============================================================
+   Profile — CSPJ共通データ取得モジュール(/dj/shared/js/profile-data.js)を
+   本番の公開API接続で使用する。
+
+   CSPJProfile.fetchProfile('yu-x') は内部で GET https://api.cs-pj.com/v1/djs/yu-x
+   を呼び出す(/dj/shared/js/api-client.js 経由)。API側が display_name しか
+   返さないため、ここで動的化するのも display_name のみ(Bio/Genre/location/
+   画像はAPI側にデータが存在しないため、静的HTMLのプレースホルダーをそのまま残す)。
+
+   [data-dj-name] を付与した全要素(ヘッダーロゴ・Heroタイトル・フッター)の
+   textContentを一括で置き換える。取得できない場合(ネットワークエラー・
+   DJ非公開等)は、index.htmlに書かれた静的な「YU-X」表記をそのまま残す。
+   ============================================================ */
+(function initProfile() {
+  if (!window.CSPJProfile) return;
+  const targets = document.querySelectorAll('[data-dj-name]');
+  if (!targets.length) return;
+
+  CSPJProfile.fetchProfile('yu-x')
+    .then((profile) => {
+      if (!profile || !profile.display_name) return; // 取得失敗時は静的表記を維持
+      targets.forEach((el) => { el.textContent = profile.display_name; });
+    })
+    .catch((err) => {
+      console.warn('[Profile] 読み込み失敗 → 静的HTMLの表記を維持:', err.message);
+    });
+})();
+
+/* ============================================================
    Schedule — CSPJ共通データ取得モジュール(/dj/shared/js/schedule-data.js)を
    本番の公開API接続(APIモード)で使用する。
 
@@ -130,7 +158,9 @@
       btn.type = 'button';
       btn.className = 'schedule__flyer-btn';
       btn.textContent = 'FLYERを見る';
-      btn.addEventListener('click', () => openFlyerModal(flyerSrc));
+      // event_nameをalt文言の材料として渡す(API画像にaltデータが無いため、
+      // 文脈から安全な短い代替テキストをここで組み立てる)。
+      btn.addEventListener('click', () => openFlyerModal(flyerSrc, ev.event_name));
       li.querySelector('.schedule__aside').appendChild(btn);
     }
 
@@ -180,7 +210,7 @@
     document.body.style.overflow = '';
   }
 
-  window.openFlyerModal = function openFlyerModal(rawUrl) {
+  window.openFlyerModal = function openFlyerModal(rawUrl, eventName) {
     const m = ensureModal();
     const status = m.querySelector('.flyer-modal__status');
     const img = m.querySelector('.flyer-modal__img');
@@ -188,6 +218,9 @@
 
     img.style.display = 'none';
     img.removeAttribute('src');
+    // APIのevent_nameからaltを組み立てる(API画像自体にaltデータは無いため)。
+    // event_nameが無い行でも、既存の汎用文言「フライヤー」にフォールバックする。
+    img.alt = eventName ? `${eventName}のフライヤー` : 'フライヤー';
     fallback.style.display = 'none';
     status.style.display = 'block';
     status.textContent = 'Loading…';
@@ -255,7 +288,10 @@
     if (hasImage) {
       const imageWrap = document.createElement('div');
       imageWrap.className = 'news__image';
-      imageWrap.innerHTML = `<img src="${escapeHtml(item.image_url)}" alt="">`;
+      // APIレスポンスに画像用のalt項目は無いため、記事タイトルから安全な
+      // 代替テキストを組み立てる(空alt="" にはしない — 2026-09対応)。
+      const imgAlt = item.title ? `${item.title}の関連画像` : 'NEWS画像';
+      imageWrap.innerHTML = `<img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(imgAlt)}">`;
       article.appendChild(imageWrap);
     }
 
@@ -281,21 +317,80 @@
 })();
 
 /* ============================================================
-   SNS LINKS — 現時点では公開APIに接続していない(土台のみ)。
-   .social__list (data-social-list) に「Coming Soon」を静的表示しているだけ。
-   将来ここに initSocialLinks() を追加し、{ platform, url, enabled } の配列から
-   enabled=true の項目だけを .social__link として描画する想定
-   (架空のURLは今回設定していない)。
+   SNS LINKS — CSPJ共通データ取得モジュール(/dj/shared/js/social-data.js)を
+   本番の公開API接続(GET https://api.cs-pj.com/v1/djs/yu-x/social-links)で使用する。
+
+   CSPJSocialData.fetchSocialLinks('yu-x') は登録されているSNSリンクをすべて
+   返す(「表示ON/OFF」の真偽値はDBに存在せず、行の存在自体が表示対象を意味する
+   設計のため、ここでの追加フィルタは行わない)。
+
+   標準SNS(other以外)はAPIがlabelを返さない(常にnull)ため、表示名は
+   このページ側の定数(SERVICE_LABELS)で決定する。これはDJ固有のコンテンツ
+   データではなく、UI上のプラットフォーム表示名という純粋な見た目の情報のため、
+   「コンテンツをハードコードしない」方針には反しない。
+
+   取得できない場合(ネットワークエラー・DJ非公開等)や0件の場合は、
+   index.htmlに書かれた静的HTML(Coming Soonプレースホルダー)をそのまま残す。
    ============================================================ */
+(function initSocialLinks() {
+  const container = document.querySelector('[data-social-list]');
+  if (!container || !window.CSPJSocialData) return;
+
+  // API側の実際のservice値(cspj-manage側DBのCHECK制約と一致)のみに対応する。
+  // ここに無い値が万一返ってきた場合は、service文字列自体をそのまま表示名として使う
+  // (未知の値でも安全に描画は継続する。架空のプラットフォーム名は追加しない)。
+  const SERVICE_LABELS = {
+    instagram: 'Instagram',
+    x: 'X',
+    tiktok: 'TikTok',
+    youtube: 'YouTube',
+    facebook: 'Facebook',
+    threads: 'Threads',
+  };
+
+  CSPJSocialData.fetchSocialLinks('yu-x')
+    .then((links) => {
+      if (!links.length) return; // 0件なら静的プレースホルダー(Coming Soon)を維持
+
+      const list = document.createElement('div');
+      list.className = 'social__index';
+      links.forEach((link) => list.appendChild(renderSocialItem(link)));
+
+      container.innerHTML = '';
+      container.appendChild(list);
+
+      console.log(
+        `%c[Social] ${links.length}件を公開APIから読み込みました`,
+        'color:#f4c6ff; font-weight:bold;'
+      );
+    })
+    .catch((err) => {
+      console.warn('[Social] 読み込み失敗 → 静的HTMLのプレースホルダーを維持:', err.message);
+    });
+
+  function renderSocialItem(link) {
+    const { escapeHtml } = CSPJUtils;
+    // service='other' の場合のみAPIがlabelを返す(標準SNSは常にnull)。
+    const displayLabel = link.label || SERVICE_LABELS[link.service] || link.service;
+
+    const a = document.createElement('a');
+    a.className = 'social__index-item';
+    a.href = link.url; // fetchSocialLinks()側でhttp/https以外・空文字は既に除外済み
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.innerHTML = `${escapeHtml(displayLabel)}<span class="social__index-arrow" aria-hidden="true">↗</span>`;
+
+    return a;
+  }
+})();
 
 /* ============================================================
-   Popup — 将来のAPI接続に備えた最小限の土台。Flyer Modalとは
-   DOM・クラス名・実装を完全に分離している(用途が異なるため)。
+   Popup — モーダルのDOM生成・ARIA・開閉処理(window.CSPJPopup)。
+   Flyer Modalとは DOM・クラス名・実装を完全に分離している(用途が異なるため)。
+   実際にAPIから取得したデータで開くかどうかの判断は、下の initPopupApi() が
+   window.CSPJPopup.open() を呼び出す形で行う(責務分離)。
 
-   今回はAPI未接続のため、ページ読み込み時に自動的に開くことはない。
-   表示条件・頻度制御(Cookie等による「1日1回だけ表示」等)も今回は対象外。
-   将来、POPUP用の公開APIから取得したデータをそのまま
-   window.CSPJPopup.open({ title, body, image }) に渡せば表示できる。
+   表示条件・頻度制御(Cookie等による「1日1回だけ表示」等)は今回のスコープ外。
    ============================================================ */
 (function initPopup() {
   let modal = null;
@@ -348,6 +443,9 @@
 
     if (data && data.image) {
       imgEl.src = data.image;
+      // APIレスポンスに画像用のalt項目は無いため、POPUPのタイトルから
+      // 安全な代替テキストを組み立てる(textContent同様エスケープ不要)。
+      imgEl.alt = (data && data.title) ? `${data.title}のお知らせ画像` : 'お知らせ画像';
       imgEl.style.display = 'block';
     } else {
       imgEl.removeAttribute('src');

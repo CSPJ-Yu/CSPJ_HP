@@ -209,12 +209,13 @@ CSPJSchedule.loadFlyerImage(ev.flyer_url)
   外部入力として扱い、そのまま`innerHTML`に差し込まない)
 - APIキーやOAuth認証は一切不要(公開CSVの読み取りのみのため、鍵の漏洩リスクが存在しない)
 
-## 9. 公開API移行方針(2026-09確定 / Eventsのみ実装済み)
+## 9. 公開API移行方針(2026-09確定 / YU-Xで5機能すべて実装済み)
 
 Cloudflare D1 + R2 + 公開API(`api.CSPJ_HP`、本番: `https://api.cs-pj.com`)への移行方針。
-**現時点でEvents(Schedule)のみAPIモードへ対応済みです。** DJ一覧・DJプロフィール・News・
-Social Links・Popupは未着手のままです(1〜8章のGoogle Sheets / Forms運用は、Eventsについても
-CSVモードとして`schedule-data.js`内に残っており、廃止していません)。
+**`/dj/yu-x/`では、PROFILE(部分)/SCHEDULE/NEWS/SNS/POPUPの5機能すべてを公開API接続
+済みです**(2026-09完了。1〜8章のGoogle Sheets / Forms運用は、Eventsについても
+CSVモードとして`schedule-data.js`内に残っており、廃止していません。`/dj/sample/`が
+引き続き使用するためです)。他のDJページ(`yu-x`以外)は今回対象外で、個別に移行が必要です。
 
 ### 9-1. Events(Schedule) — 実装済み
 
@@ -251,19 +252,55 @@ CSVモードとして`schedule-data.js`内に残っており、廃止してい�
   「Drive形式でない場合はそのまま1回だけ試す」という既存の分岐にそのまま乗るため、実装の
   変更が不要でした。
 
-### 9-2. DJ一覧・DJプロフィール — 今回は対象外
+### 9-2. DJプロフィール — display_nameのみ実装済み(2026-09)
+
+`dj/shared/js/profile-data.js`(`CSPJProfile.fetchProfile(slug)`)が
+`GET /v1/djs/:slug` から取得する。YU-Xでは`script.js`の`initProfile()`が、
+取得した`display_name`を`[data-dj-name]`を付与した全要素(ヘッダーロゴ・Hero
+タイトル・フッター)へ反映する。
+
+**API側の制約(未解消)**: D1の`djs`テーブルには`dj_id`/`display_name`/`status`/
+`slug`/`email`しかカラムが無く、公開APIも`slug`/`display_name`の2項目しか返さない。
+そのため、Bio文章・Genre・location・プロフィール画像は今回も動的化していない
+(推測して追加していない)。各DJページのプロフィール文章セクションは、引き続き
+各ページのHTMLに直接記述する運用のまま。API側にカラム・専用endpointが追加された
+場合のみ、このモジュールを拡張すること。
 
 - DJ一覧(`dj/index.html`の`.dj-grid`)は引き続き静的HTMLの手動更新のままです。公開APIに
   DJ一覧を返すエンドポイント(`GET /v1/djs`等)が無いため、現状は動的化できません。
-- DJプロフィール(bio文章・タグ・写真等)は、そもそもD1(`djs`テーブル)にそれらのカラムが
-  存在せず、公開APIも`slug`/`display_name`のみしか返しません。各DJページのプロフィール
-  セクションは、引き続き各ページのHTMLに直接記述する運用です。
 
-### 9-3. News / Social Links / Popup — 未着手
+### 9-3. News / Social Links / Popup — 実装済み(2026-09)
 
-`GET /v1/djs/:slug/news` `GET /v1/djs/:slug/social-links` `GET /v1/djs/:slug/popup` は
-API側で稼働済みですが、CSPJ_HP側の取得モジュール(`news-data.js` / `social-data.js` /
-`popup-data.js`)・表示実装はまだ作成していません。
+`GET /v1/djs/:slug/news` `GET /v1/djs/:slug/social-links` `GET /v1/djs/:slug/popup` を
+それぞれ `news-data.js` / `social-data.js` / `popup-data.js` が取得し、YU-Xの`script.js`が
+描画する(責務分離は他のデータモジュールと同じ)。
+
+- **News**: `title`/`body`/`publish_date`/`image_url`を表示。`links`(関連リンク配列)は
+  取得はするが今回は描画に使用しない。画像が無い記事でもレイアウトが崩れないよう
+  `.news__item--with-image`修飾クラスの有無で分岐する(既存実装のまま)。
+- **Social Links**: `service`/`label`/`url`を使用。標準SNS(`instagram`/`x`/`tiktok`/
+  `youtube`/`facebook`/`threads`)はAPIが`label`を返さない(常にnull)ため、表示名は
+  `script.js`側の定数`SERVICE_LABELS`で決定する(DJ固有コンテンツではなくUI上の
+  表示名のため、ハードコード禁止方針には抵触しない)。`service='other'`の場合のみ
+  APIの`label`をそのまま使う。DBに「表示ON/OFF」の真偽値カラムは存在せず、行が
+  登録されていること自体が表示対象を意味する設計のため、フロント側での追加フィルタは
+  行わない(URLがhttp/https以外・空の行は防御的に除外)。0件・取得失敗時は静的な
+  「Coming Soon」プレースホルダーを維持する。
+- **Popup**: 既存実装(2026-09の別タスクで接続済み)を維持し、今回は監査のみ。
+  `expires_at`が過去の場合は`popup-data.js`側でも二重に除外する。POPUP画像の`alt`は
+  API側にデータが無いため、`script.js`側で`{title}のお知らせ画像`という文脈依存の
+  代替テキストを組み立てる(2026-09改善)。
+
+### 9-4. アクセシビリティ改善(2026-09)
+
+API由来の画像(`image_url`)には`alt`データがAPIに存在しないため、以下のように
+文脈から安全な短い代替テキストを`script.js`側で組み立てるようにした:
+
+| 画像 | alt生成ルール |
+|---|---|
+| NEWS一覧の画像 | `{news.title}の関連画像` |
+| POPUP画像 | `{popup.title}のお知らせ画像` |
+| Flyer Modal画像 | `{event.event_name}のフライヤー`(event_name が無い行は「フライヤー」) |
 
 ### 残す / 置き換える / 不要になる の仕分け(Events実装後・確定)
 
@@ -282,16 +319,17 @@ API側で稼働済みですが、CSPJ_HP側の取得モジュール(`news-data.j
 | CSV用フォールバックID生成(`date__venue__index`) | **維持**。CSVモード専用のロジックとして残る(APIモードでは使われない) |
 | `dj/sample/events.sample.csv` | **恒久的に維持**。API化しない技術サンプルとして今後も使用する |
 
-### モジュール構成(Events実装済み)
+### モジュール構成(2026-09時点。YU-Xで5機能すべて実装済み)
 
 ```
 dj/shared/js/
 ├─ api-client.js    … ✅実装済み。公開APIへの共通fetch処理(認証不要・JSON取得のみ)
 ├─ utils.js         … ✅実装済み。formatDateParts() / escapeHtml() 等、データ非依存の共通utility
+├─ profile-data.js  … ✅実装済み。GET /v1/djs/:slug(display_nameのみ。API側の制約は9-2章参照)
 ├─ schedule-data.js … ✅Events実装済み(API/CSV両対応)。fetchEvents()の名称・返却形式は維持
-├─ news-data.js     … 未実装(次のステップ)
-├─ social-data.js   … 未実装
-└─ popup-data.js    … 未実装
+├─ news-data.js     … ✅実装済み。GET /v1/djs/:slug/news
+├─ social-data.js   … ✅実装済み。GET /v1/djs/:slug/social-links
+└─ popup-data.js    … ✅実装済み。GET /v1/djs/:slug/popup
 ```
 
 各DJ固有の`script.js`は描画・UI制御のみを担当し、共有モジュール側はデータ取得・共通処理のみを

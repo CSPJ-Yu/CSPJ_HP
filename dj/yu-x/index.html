@@ -28,15 +28,19 @@
 
   <!--
     CSPJ共通のデータ取得モジュール(データ取得のみ・HTML/CSSは含まない)。
-    読み込み順に注意: utils.js → api-client.js → schedule-data.js → news-data.js → popup-data.js
+    読み込み順に注意: utils.js → api-client.js → (各データモジュール、順不同)
     (schedule-data.jsの読み込み位置・内容は変更していない)
     詳細は /dj/README.md の「9. 公開API移行方針」を参照。
-    現時点でAPI接続しているのはSCHEDULE / NEWS / POPUP(SNSは今回も土台のみ)。
+    2026-09時点でPROFILE / SCHEDULE / NEWS / SNS / POPUPの5機能すべてを
+    公開API(api.cs-pj.com)へ接続済み。PROFILEはAPI側にBio/Genre/location/
+    画像のカラムが存在しないため、display_nameのみAPIから取得する(script.js参照)。
   -->
   <script src="/dj/shared/js/utils.js"></script>
   <script src="/dj/shared/js/api-client.js"></script>
+  <script src="/dj/shared/js/profile-data.js"></script>
   <script src="/dj/shared/js/schedule-data.js"></script>
   <script src="/dj/shared/js/news-data.js"></script>
+  <script src="/dj/shared/js/social-data.js"></script>
   <script src="/dj/shared/js/popup-data.js"></script>
 </head>
 <body>
@@ -55,7 +59,7 @@
 
   <header class="site-header">
     <div class="site-header__inner">
-      <a href="#top" class="brand">YU-X</a>
+      <a href="#top" class="brand" data-dj-name>YU-X</a>
       <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -83,7 +87,7 @@
 
       <div class="hero__inner">
         <p class="hero__eyebrow">Connect Spread PJ Presents</p>
-        <h1 class="hero__title">YU-X</h1>
+        <h1 class="hero__title" data-dj-name>YU-X</h1>
         <p class="hero__role">DJ<span class="hero__role-sep" aria-hidden="true">/</span>ARTIST</p>
         <!-- TODO(CSPJ): 正式なキャッチコピー/プロフィール文が届き次第、下記を差し替える -->
         <p class="hero__tagline">プロフィール準備中です。</p>
@@ -96,12 +100,25 @@
         <h2 class="section-title" id="profile-heading">
           <span aria-hidden="true">01</span>Profile
         </h2>
+        <!--
+          PROFILE: 公開API接続済み(GET https://api.cs-pj.com/v1/djs/yu-x)。
+          データ取得は /dj/shared/js/profile-data.js (CSPJProfile.fetchProfile)が担当し、
+          このページ固有の描画(data-dj-name要素への反映)は script.js の initProfile() が
+          担当する。
+
+          【API側の制約】cspj-manage側のdjsテーブルには slug/display_name/status しか
+          カラムが存在せず、公開APIも display_name しか返さない。Bio・Genre・location・
+          プロフィール画像はAPI側にデータ自体が存在しないため、これらは今回も動的化して
+          いない(推測して追加していない)。API側にカラム・endpointが追加された場合のみ
+          対応すること。
+        -->
         <div class="profile__grid">
-          <!-- TODO(CSPJ): プロフィール写真が届き次第、この枠に <img> を差し込む -->
+          <!-- TODO(CSPJ): プロフィール写真が届き次第、この枠に <img> を差し込む
+               (API側に画像フィールドが無いため、現状のローカル表示を維持している) -->
           <div class="profile__photo" aria-hidden="true"><span>PHOTO</span></div>
           <div class="profile__text">
             <!-- TODO(CSPJ): 正式なプロフィール文章(活動歴・得意ジャンル・出演実績など)が
-                 届き次第、下記のプレースホルダーを差し替える -->
+                 API側に追加され次第、下記のプレースホルダーを差し替える -->
             <p>プロフィール情報を準備中です。</p>
           </div>
         </div>
@@ -148,10 +165,15 @@
 
   <!--
     SNS LINKS: ページ下部のリンク領域として扱い、メインナビゲーションには含めない。
-    まだ公開APIに接続していない(土台のみ)。
-    将来のデータ形状: { platform, url, enabled } の配列。enabled=trueの項目だけ描画する。
-    想定プラットフォーム: Instagram / X / TikTok / YouTube / SoundCloud / Mixcloud / その他
-    架空のURLは設定しない。将来JSからリンクを差し込むコンテナは data-social-list で明示。
+    公開API接続済み(GET https://api.cs-pj.com/v1/djs/yu-x/social-links)。
+    データ取得・正規化は /dj/shared/js/social-data.js (CSPJSocialData.fetchSocialLinks)が
+    担当し、このページ固有の描画(表示名マッピング・.social__indexへの差し込み)は
+    script.js の initSocialLinks() が担当する(責務分離)。
+    実際のservice値: instagram/x/tiktok/youtube/facebook/threads/other
+    (cspj-manage側DBのCHECK制約と一致。SoundCloud/Mixcloud等は現時点で未対応)。
+    「表示ON/OFF」の真偽値カラムはDBに存在せず、行が登録されていること自体が
+    表示対象であることを意味する(APIがすでに絞り込み済み。フロント側で再フィルタしない)。
+    0件・取得失敗時は、この静的なCome Soonプレースホルダーをそのまま維持する(script.js参照)。
   -->
   <section id="social" class="social" aria-labelledby="social-heading">
     <div class="wrap">
@@ -163,7 +185,9 @@
   </section>
 
   <footer class="site-footer">
-    <p>YU-X Official Page — Produced by Connect Spread PJ (CSPJ)</p>
+    <!-- data-dj-name: 他の2箇所(ヘッダーロゴ / Heroタイトル)と同じくPROFILE API
+         (display_name)から動的に反映する。取得できない場合は静的な「YU-X」を維持。 -->
+    <p><span data-dj-name>YU-X</span> Official Page — Produced by Connect Spread PJ (CSPJ)</p>
   </footer>
 
   <script src="script.js"></script>
