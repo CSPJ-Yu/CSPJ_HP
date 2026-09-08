@@ -48,8 +48,11 @@
    4. 検索入力(#djSearchInput)に応じて、取得済みのDJをクライアント側で
       大文字小文字を区別せずフィルタする(DJ名・slugの両方が対象)。
 
-   写真・ジャンルは公開APIにデータが存在しないため、今回は表示しない
-   (推測で追加していない。/dj/README.md参照)。
+   写真(Portal Card画像)に加え、2026-09にMain Genre表示にも対応した
+   (公開APIの GET /v1/djs/:slug/genres を dj/shared/js/genre-data.js
+   経由で取得。取得・検証・main抽出はそちら側の責務で、ここではnullチェックと
+   描画のみ行う)。Genreはoptional情報のため、取得失敗時もカード自体は
+   表示する(/dj/README.md参照)。
    ============================================================ */
 (function initDjList() {
   var grid = document.querySelector('[data-dj-grid]');
@@ -113,12 +116,22 @@
     name.className = 'djp-card__name';
     name.textContent = dj.display_name; // textContentのためエスケープ不要
 
+    // Main Genre: 常に要素自体は生成する(Genreあり/なしでカード高さを揃える
+    // ための予約領域。CSS側の min-height で高さを確保しているため、
+    // textContentが空でもレイアウトは崩れない)。Genre未登録時は
+    // 「UNKNOWN」等の代替文字列を入れず、空のまま(=画面にもAT(支援技術)にも
+    // 何も表示・読み上げられない)にする。APIデータのためtextContentのみ使用し、
+    // innerHTMLへは一切渡さない(XSS対策)。
+    var genre = document.createElement('p');
+    genre.className = 'djp-card__genre';
+    if (dj.main_genre) genre.textContent = dj.main_genre;
+
     var link = document.createElement('span');
     link.className = 'djp-card__link';
     link.innerHTML = 'VIEW ARTIST <span aria-hidden="true">→</span>';
 
     body.appendChild(name);
-    // Genre: 公開APIにデータが存在する場合のみ表示する(現状は常に無し)。
+    body.appendChild(genre);
     body.appendChild(link);
     a.appendChild(body);
 
@@ -211,8 +224,18 @@
       slugs.map(function (slug) {
         // fetchProfile自体は基本的にrejectしない設計(取得失敗時はnullを解決する)
         // だが、想定外の例外(スクリプトエラー等)に備えてcatchでrejectedに倒す。
-        return CSPJProfile.fetchProfile(slug)
-          .then(function (profile) {
+        // fetchMainGenre(genre-data.js)も同じくrejectしない設計(Genreは
+        // あくまでoptional情報のため、取得失敗はnullとして扱いDJカード自体は
+        // 表示を継続する。CSPJGenreData自体が読み込めない場合に備えたガードも
+        // 入れておく)。
+        var genrePromise = window.CSPJGenreData
+          ? CSPJGenreData.fetchMainGenre(slug)
+          : Promise.resolve(null);
+
+        return Promise.all([CSPJProfile.fetchProfile(slug), genrePromise])
+          .then(function (result) {
+            var profile = result[0];
+            var mainGenre = result[1];
             if (!profile || !profile.display_name) return null;
             return {
               slug: profile.slug || slug,
@@ -220,6 +243,9 @@
               // Portal Card画像。未対応API・値なし・不正URLはprofile-data.js側で
               // 既にnullに正規化済み(推測データを補完しない)。
               portal_card_image_url: profile.portal_card_image_url || null,
+              // Main Genre。未登録・API未対応・取得失敗はgenre-data.js側で
+              // 既にnullに正規化済み(Sub Genreはここでは一切扱わない)。
+              main_genre: (mainGenre && mainGenre.name) ? mainGenre.name : null,
             };
           })
           .catch(function (err) {

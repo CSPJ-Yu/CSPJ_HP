@@ -357,23 +357,38 @@ a.djp-card:focus-visible {
   padding: clamp(1.1rem, 2.5vw, 1.5rem);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
   flex: 1;
 }
 .djp-card__name {
   font-family: var(--djp-font-serif);
   font-weight: 400;
   font-size: 1.15rem;
+  line-height: 1.2;
   letter-spacing: 0.01em;
   color: var(--djp-color-text-primary);
 }
+/* Main Genre(Editorial metadata)。DJ名よりかなり小さく、控えめな
+   muted/secondaryカラーで1行だけ表示する(badge/pill化しない)。
+   Genre未登録のDJでは script.js 側がtextContentを空のままにするため、
+   このmin-heightが無いとカードの高さがGenreありのカードとズレてしまう
+   (flexアイテム化されるため、spanでもmin-heightが効く)。
+   このクラスは元々Next Artist/Coming Soonカードの"Coming Soon"表示にも
+   共用されている(placeholder側は下の.djp-card--placeholderルールで
+   さらに控えめな色に上書きされるため、この基本色の変更は実DJカードの
+   Main Genre表示にのみ影響する)。 */
 .djp-card__genre {
   font-family: var(--djp-font-sans);
   font-size: 0.6rem;
   font-weight: 400;
+  line-height: 1.2;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--djp-color-cyan);
+  color: var(--djp-color-text-secondary);
+  min-height: 0.72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .djp-card__desc {
   font-family: var(--djp-font-ja);
