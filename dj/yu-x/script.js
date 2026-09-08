@@ -404,13 +404,19 @@
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-labelledby', 'popup-modal-title');
     modal.setAttribute('aria-describedby', 'popup-modal-body');
+    // 閉じるボタン(.popup-modal__close)は .popup-modal__scroll の外に置く。
+    // 本文が長くなっても、スクロールするのは .popup-modal__scroll だけで、
+    // 閉じるボタンは常に.popup-modal__inner基準の右上に固定表示され続ける
+    // (モバイルで下までスクロールすると×が画面外へ消える問題への対応)。
     modal.innerHTML = `
       <div class="popup-modal__inner">
         <button type="button" class="popup-modal__close" aria-label="閉じる">✕</button>
-        <span class="popup-modal__label" aria-hidden="true">Notice</span>
-        <img class="popup-modal__img" alt="" style="display:none;">
-        <h2 class="popup-modal__title" id="popup-modal-title"></h2>
-        <p class="popup-modal__body" id="popup-modal-body"></p>
+        <div class="popup-modal__scroll">
+          <span class="popup-modal__label" aria-hidden="true">Notice</span>
+          <img class="popup-modal__img" alt="" style="display:none;">
+          <h2 class="popup-modal__title" id="popup-modal-title"></h2>
+          <p class="popup-modal__body" id="popup-modal-body"></p>
+        </div>
       </div>
     `;
     document.body.appendChild(modal);

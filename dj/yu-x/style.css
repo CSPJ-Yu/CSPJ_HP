@@ -725,10 +725,22 @@ section {
   max-width: min(90vw, 420px);
   max-height: 85vh;
   width: 100%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--line-strong);
   padding: 2rem 1.75rem 1.75rem;
+}
+
+/* 閉じるボタンをスクロール領域の外に出すためのラッパー。
+   本文が長い場合はここだけがスクロールし、.popup-modal__close は
+   常に.popup-modal__inner基準の絶対位置（右上）に留まり続ける。
+   （flexの子をmax-heightの範囲内で正しく縮めてスクロールさせるため、
+   min-height: 0 が必須 — 無いとFlexboxの既定挙動でこの要素が
+   コンテンツの自然な高さまで広がり、はみ出してしまう） */
+.popup-modal__scroll {
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* 表示開始時のごく短時間だけのglitch(Digital要素)。is-openが付与された
@@ -766,7 +778,6 @@ section {
   width: 100%;
   margin-bottom: 1.25rem;
   display: block;
-  filter: grayscale(1);
 }
 
 .popup-modal__title {
