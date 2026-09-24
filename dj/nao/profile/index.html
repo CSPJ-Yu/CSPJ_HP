@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="DJ NAO 公式サイト PROFILE(Connect Spread PJ制作)。">
+  <title>PROFILE — DJ NAO</title>
+
+  <!--
+    【重要】このページ(/dj/nao/profile/)は本格デザイン制作の第1弾として、
+    /dj/nao/style.css・/dj/nao/script.js(TOP/NEWS/SCHEDULE/DISCOGRAPHYが
+    使うプロトタイプ用の共通ファイル)から完全に独立させた。
+    style.css / script.js はこのディレクトリ専用(他ページに影響しない)。
+
+    レイアウトは https://avex.jp/djkoo/profile/ の実装をブラウザで検証し、
+    DOM構造・寸法をComputed Styleレベルで確認した上で、構造を忠実に
+    再現しつつテーマカラーをdeeppinkに置き換えて新規に書き起こしたもの。
+    元サイトのCSS/画像/アセットはコピーしていない。
+
+    データ取得はCSPJ共通層(/dj/shared/js/)をそのまま再利用する
+    (取得層は共通・DOM/CSS/デザインはこのページ専用、という責務分離)。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap" rel="stylesheet">
+  <!-- ?v=YYYYMMDD-N: キャッシュバスター(TOP/dj/nao/index.htmlと同じ方針)。 -->
+  <link rel="stylesheet" href="style.css?v=20260925-1">
+
+  <script src="/dj/shared/js/utils.js"></script>
+  <script src="/dj/shared/js/api-client.js"></script>
+  <script src="/dj/shared/js/profile-data.js"></script>
+  <script src="/dj/shared/js/social-data.js"></script>
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <!-- data-dj-logo: TOP(/dj/nao/)と同じロゴ画像。profile.display_nameが
+           取得できた場合、script.jsがalt属性/aria-labelを更新する(画像自体は
+           差し替えない。TOPのscript.jsと同じ設計)。 -->
+      <a href="/dj/nao/" class="brand" aria-label="NAO">
+        <img src="../images/logo-nao-deeppink.png" alt="NAO" class="brand__logo" data-dj-logo>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="siteNav">
+        <a href="/dj/nao/">TOP</a>
+        <a href="/dj/nao/news/">NEWS</a>
+        <a href="/dj/nao/schedule/">SCHEDULE</a>
+        <a href="/dj/nao/profile/" aria-current="page">PROFILE</a>
+        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
+      </nav>
+
+      <!--
+        TODO(CSPJ): NAOの正式な問い合わせ導線(booking/contact窓口)が決定次第、
+        以下の対応を行うこと。
+          1. hidden属性を外す
+          2. href="#" を実際のcontact先へ差し替える
+        「CONTACT」というラベルと遷移先の意味が一致しない状態(例: SNSセクションへの
+        代替アンカー)での暫定公開はしない方針のため、決定するまでは非表示のまま
+        保持する(DOM/CSSはそのまま残し、いつでも有効化できる状態にしておく)。
+      -->
+      <a href="#" class="header-cta" hidden><span class="header-cta__label--full">CONTACT</span></a>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <!-- ============ Page Banner(対角線2トーン背景 + PROFILE見出し) ============ -->
+    <section class="page-banner">
+      <div class="page-banner__diagonal" aria-hidden="true"></div>
+      <div class="page-banner__diagonal page-banner__diagonal--2" aria-hidden="true"></div>
+      <p class="page-banner__eyebrow">Connect Spread PJ</p>
+      <h1 class="page-banner__title">PROFILE</h1>
+    </section>
+
+    <!-- ============ profBox #1: DJ NAO本人プロフィール ============
+         PROFILE: 公開API接続(GET https://api.cs-pj.com/v1/djs/nao)。
+         data-dj-photo は portal_card_image_url が取得できた場合のみJSが<img>を
+         差し込む枠(script.jsのinitProfile()参照)。Bio・Genre・locationは
+         API側にデータ自体が存在しないため、動的化していない(推測して追加していない)。 -->
+    <article class="profBox" aria-labelledby="profile-name">
+      <div class="profBox__photo" data-dj-photo aria-hidden="true"><span>PHOTO</span></div>
+      <h2 class="profBox__name" id="profile-name" data-dj-name>NAO</h2>
+      <div class="profBox__bio">
+        <!-- TODO(CSPJ): 正式なプロフィール文章(活動歴・得意ジャンル・出演実績など)が
+             届き次第、下記のプレースホルダーを差し替える -->
+        <p>プロフィール情報を準備中です。活動歴・得意ジャンル・出演実績などは、内容が確定次第こちらに掲載します。</p>
+      </div>
+      <!--
+        SNS LINKS — 公開API接続(GET https://api.cs-pj.com/v1/djs/nao/social-links)。
+        データ取得は共通層、アイコン描画(モノラインSVG)はこのページのscript.jsが担当。
+        0件・取得失敗時は静的なCome Soonプレースホルダーを維持する。
+      -->
+      <div id="social" data-social-list>
+        <p class="profBox__sns-placeholder">SNS: Coming Soon</p>
+      </div>
+    </article>
+
+    <!-- ============ profBox #2以降: 将来の特別プロジェクト用の予約枠 ============
+         元サイトのUKOON(DJ KOO固有の特別ユニット紹介)に相当する位置。
+
+         【重要】NAOに対応する正式なユニット・Special Projectは現時点で存在しない。
+         「Coming Soon」「Special Project」等の架空・未確定情報を公開ページ上に
+         表示することはしない方針のため、データが無い間はこのブロック自体を
+         hidden属性で非表示にする(=DOM上には残すが描画しない)。
+
+         方針: データが存在する → このprofBoxのhiddenを外し実データで内容を埋める
+              データが存在しない → hiddenのまま(現在の状態)
+         対応する公開データ層(Public APIのendpoint等)は2026-09時点で存在しないため、
+         これは「CSPJ側が内容確定後に手動でhiddenを外し、下記のプレースホルダー
+         文言を実データに差し替える」運用を前提とした静的な出し分けである
+         (架空データをAPI経由で取得しているわけではない)。将来、共通データ層に
+         対応するモジュールが追加された場合は、その取得結果の有無に応じて
+         JS側でhidden属性を切り替える形に発展させる想定。 -->
+    <article class="profBox profBox--reserved" aria-labelledby="reserved-name" hidden>
+      <div class="profBox__photo" aria-hidden="true"><span>Coming Soon</span></div>
+      <h2 class="profBox__name" id="reserved-name">Special Project</h2>
+      <div class="profBox__bio">
+        <p>新プロジェクトの情報は準備中です。内容が確定し次第、このスペースで公開します。</p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+        <a href="/dj/nao/">TOP</a>
+        <a href="/dj/nao/news/">NEWS</a>
+        <a href="/dj/nao/schedule/">SCHEDULE</a>
+        <a href="/dj/nao/profile/">PROFILE</a>
+        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
+      </nav>
+      <p><span data-dj-name>NAO</span> Official Site — Produced by <a class="site-footer__credit-link" href="https://cs-pj.com/">Connect Spread PJ (CSPJ)</a></p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=20260925-1"></script>
+</body>
+</html>

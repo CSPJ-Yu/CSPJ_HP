@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="DJ NAO 公式サイト NEWS一覧(Connect Spread PJ制作)。">
+  <title>NEWS — DJ NAO</title>
+
+  <!-- /dj/nao/ 配下で共有されるスタイル/スクリプト。詳細はindex.html参照。 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- ?v=YYYYMMDD-N: キャッシュバスター(TOP/dj/nao/index.htmlと同じ方針)。 -->
+  <link rel="stylesheet" href="../style.css?v=20260925-1">
+
+  <script src="/dj/shared/js/utils.js"></script>
+  <script src="/dj/shared/js/api-client.js"></script>
+  <script src="/dj/shared/js/profile-data.js"></script>
+  <script src="/dj/shared/js/news-data.js"></script>
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <!-- data-dj-logo: TOP(/dj/nao/)と同じロゴ画像。script.jsのinitProfile()が
+           display_name取得時にalt属性/aria-labelのみ更新する(画像は差し替えない)。 -->
+      <a href="/dj/nao/" class="brand" aria-label="NAO">
+        <img src="../images/logo-nao-deeppink.png" alt="NAO" class="brand__logo" data-dj-logo>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="/dj/nao/">TOP</a>
+        <a href="/dj/nao/news/" aria-current="page">NEWS</a>
+        <a href="/dj/nao/schedule/">SCHEDULE</a>
+        <a href="/dj/nao/profile/">PROFILE</a>
+        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="page-hero">
+      <p class="page-hero__eyebrow">DJ NAO</p>
+      <h1 class="page-hero__title">NEWS</h1>
+      <p class="page-hero__lead">最新のお知らせ・活動情報をお届けします。</p>
+    </section>
+
+    <section aria-labelledby="news-list-heading">
+      <div class="wrap">
+        <h2 class="section-title section-title--plain" id="news-list-heading">All News</h2>
+        <!--
+          NEWS全件一覧 — 公開API接続(GET https://api.cs-pj.com/v1/djs/nao/news)。
+          data-news-limitを指定しないため全件描画する(TOPページのティザーと同じ
+          script.jsのinitNews()を共有。挙動の分岐は limit有無のみ)。
+        -->
+        <div class="news__list" data-news-list>
+          <p class="news__placeholder">Coming Soon — 現在、お知らせはありません。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+        <a href="/dj/nao/">TOP</a>
+        <a href="/dj/nao/news/">NEWS</a>
+        <a href="/dj/nao/schedule/">SCHEDULE</a>
+        <a href="/dj/nao/profile/">PROFILE</a>
+        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
+      </nav>
+      <p><span data-dj-name>NAO</span> Official Site — Produced by <a class="site-footer__credit-link" href="https://cs-pj.com/">Connect Spread PJ (CSPJ)</a></p>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=20260925-1"></script>
+</body>
+</html>
