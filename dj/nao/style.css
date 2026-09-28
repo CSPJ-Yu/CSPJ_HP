@@ -496,8 +496,9 @@ section {
   width: 100%;
   aspect-ratio: 4 / 5;
   border-radius: var(--radius);
-  background: var(--gradient-soft);
-  border: 1px dashed var(--line-strong);
+  /* object-fit: containで生まれる左右の余白を、写真の背景として
+     馴染むよう白に変更(枠線も削除)。 */
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
