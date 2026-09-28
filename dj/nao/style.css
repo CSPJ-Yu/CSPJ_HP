@@ -507,7 +507,9 @@ section {
 .profile__photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* coverだと顔や身体が枠からはみ出て見切れてしまうため、containで
+     写真全体が縮小されて収まるようにする(余白は枠の背景色で埋まる)。 */
+  object-fit: contain;
 }
 
 .profile__photo span {
