@@ -75,7 +75,15 @@
   --shadow-lift: 0 18px 44px rgba(255, 20, 147, 0.16);
 }
 
-html { scroll-behavior: smooth; }
+/* ページごとに中身の縦の長さが違うと、縦スクロールバーの有無で実質的な
+   ビューポート幅が変わり、右寄せのヘッダーナビの位置がページ間で
+   数px〜十数pxズレて見える(Windows等、非オーバーレイ型スクロールバー環境)。
+   常にスクロールバー分の余白を確保することで、全ページで位置を固定する。 */
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
 
 body {
   background: var(--bg);
