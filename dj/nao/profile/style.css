@@ -302,8 +302,9 @@ ul { list-style: none; }
 .profBox__photo {
   width: 100%;
   aspect-ratio: 3 / 4;
-  background: var(--accent-soft);
-  border: 1px dashed var(--line-strong);
+  /* object-fit: containで生まれる余白を、写真の背景として馴染むよう
+     白に変更(枠線も削除。TOPの.profile__photoと同じ対応)。 */
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -315,7 +316,9 @@ ul { list-style: none; }
 .profBox__photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* coverだと顔や身体が枠からはみ出て見切れてしまうため、containで
+     写真全体が縮小されて収まるようにする。 */
+  object-fit: contain;
 }
 
 .profBox__photo span {
