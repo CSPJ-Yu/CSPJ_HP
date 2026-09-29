@@ -33,7 +33,7 @@
 
   // 実在するDJのslugのみを追加すること。新しいDJサイト(/dj/<slug>/)を
   // 追加した際は、ここにも忘れずに追加する(現状はこれが唯一の登録箇所)。
-  var KNOWN_DJ_SLUGS = ['yu-x'];
+  var KNOWN_DJ_SLUGS = ['yu-x', 'nao'];
 
   /** @returns {string[]} 既知のDJ slug一覧のコピー(呼び出し側が変更しても内部状態に影響しない)。 */
   function listKnownSlugs() {
