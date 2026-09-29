@@ -3,7 +3,7 @@
  * /dj/nao/profile/script.js
  *
  * このファイルは /dj/nao/profile/ 専用です。/dj/nao/script.js
- * (TOP/NEWS/SCHEDULE/DISCOGRAPHYが使う共通スクリプト)には依存せず、
+ * (TOP/NEWS/SCHEDULEが使う共通スクリプト)には依存せず、
  * このファイルの変更が他ページの挙動に影響することはありません。
  *
  * 【CSPJ Proプランの設計方針】

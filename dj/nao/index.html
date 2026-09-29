@@ -17,7 +17,7 @@
     /css/style.css /js/main.js、DJポータルの /portal/dj/style.css、
     および他のDJページ(/dj/yu-x/ 等)のCSS/JSは一切読み込みません。
 
-    レイアウト構成はavex.jp/djkoo/(TOP/NEWS/SCHEDULE/PROFILE/DISCOGRAPHYの
+    レイアウト構成はavex.jp/djkoo/(TOP/NEWS/SCHEDULE/PROFILEの
     独立ページ構成 + ヘッダーナビ + Hero + Profile + News/Scheduleティザー +
     特集 + SNS + Footer)を参考にしているが、配色・タイポグラフィ・実装は
     完全新規(CSPJ本体・既存DJサイトのCSS/JSはコピーしていない)。
@@ -38,7 +38,7 @@
   <!-- ?v=YYYYMMDD-N: キャッシュバスター(/portal/dj/index.html等、既存CSPJページと
        同じ運用方針)。style.css/script.jsを更新した際は、この値を当日の日付に
        更新すること(ブラウザキャッシュにより反映が遅れる問題への対応)。 -->
-  <link rel="stylesheet" href="style.css?v=20260929-3">
+  <link rel="stylesheet" href="style.css?v=20260930-10">
 
   <!--
     CSPJ共通のデータ取得モジュール(データ取得のみ・HTML/CSSは含まない)。
@@ -79,7 +79,6 @@
         <a href="/dj/nao/news/">NEWS</a>
         <a href="/dj/nao/schedule/">SCHEDULE</a>
         <a href="/dj/nao/profile/">PROFILE</a>
-        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
       </nav>
     </div>
   </header>
@@ -123,9 +122,8 @@
                取得できない間はこのプレースホルダー表示のまま。 -->
           <div class="profile__photo" data-dj-photo aria-hidden="true"><span>PHOTO</span></div>
           <div class="profile__text">
-            <!-- TODO(CSPJ): 正式なプロフィール文章(活動歴・得意ジャンル・出演実績など)が
-                 API側に追加され次第、下記のプレースホルダーを差し替える -->
-            <p>プロフィール情報を準備中です。</p>
+            <p>2003年、幼少時代から続けていたピアノによって取得した「音楽性」と「感性」を武器に地元横浜でDJデビューを果たす。</p>
+            <p>そのPLAY STYLEは、EPIC TRANCEを中心に「聞かせて盛り上げる」だけでは無く、得意のパフォーマンス、持ち前の音楽センスで「見せる」「感じさせる」といった独自のPLAT STYLEを確立し、オーディエンスに感動と興奮を与えていく。</p>
             <a href="/dj/nao/profile/" class="hero__cta profile__cta">Profileを見る ↓</a>
           </div>
         </div>
@@ -175,13 +173,18 @@
         <h2 class="section-title section-title--plain" id="sound-heading">
           <span aria-hidden="true">04</span>Sound
         </h2>
-        <!-- TODO(CSPJ): SoundCloud/YouTube等のMixリンクが届き次第、hrefを実リンクに差し替える -->
-        <div class="sound__card">
-          <div class="sound__card-text">
-            <h3>Latest Mix</h3>
-            <p>最新のDJミックス・楽曲情報は準備中です。公開され次第、ここに掲載されます。</p>
+        <div class="sound__embeds">
+          <!-- Spotifyアルバム埋め込み。 -->
+          <div class="sound__embed sound__embed--wide">
+            <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/3SfW6kHKRqxbBgBkTWEAjl?utm_source=generator&amp;si=b3dfa0211c8e48d9" width="100%" height="352" frameborder="0" allowfullscreen title="DJ NAO — Spotify Album" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
-          <a href="#social" class="sound__card-link">SNSをチェック <span aria-hidden="true">↓</span></a>
+          <!-- TuneCore Japan バッジ → linkco.reのリリースページへのリンクボタン。 -->
+          <div class="sound__badge-wrap">
+            <a href="https://linkco.re/EVVZPzUf" class="sound__badge" target="_blank" rel="noopener noreferrer">
+              <img src="images/tunecore-japan-badge.png" alt="TuneCore Japan">
+            </a>
+            <p class="sound__badge-label">ALL Release Links Is Here</p>
+          </div>
         </div>
       </div>
     </section>
@@ -208,12 +211,11 @@
         <a href="/dj/nao/news/">NEWS</a>
         <a href="/dj/nao/schedule/">SCHEDULE</a>
         <a href="/dj/nao/profile/">PROFILE</a>
-        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
       </nav>
       <p><span data-dj-name>NAO</span> Official Site — Produced by <a class="site-footer__credit-link" href="https://cs-pj.com/">Connect Spread PJ (CSPJ)</a></p>
     </div>
   </footer>
 
-  <script src="script.js?v=20260929-3"></script>
+  <script src="script.js?v=20260930-10"></script>
 </body>
 </html>

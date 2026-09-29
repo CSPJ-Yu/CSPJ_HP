@@ -2,8 +2,8 @@
    DJ NAO — Official Site Stylesheet (v1)
    /dj/nao/style.css
 
-   このファイルは /dj/nao/ 配下の全ページ(TOP・NEWS・SCHEDULE・PROFILE・
-   DISCOGRAPHY)で共有される。他のどのページとも共有されない
+   このファイルは /dj/nao/ 配下の全ページ(TOP・NEWS・SCHEDULE・PROFILE)で
+   共有される。他のどのページとも共有されない
    (CSPJ本体・DJポータル・他のDJページのCSSはいずれも読み込まない)。
 
    デザイン方針: avex.jp/djkoo/ のレイアウト構造(ヘッダーナビ→Hero→
@@ -530,7 +530,8 @@ section {
 }
 
 .profile__text p {
-  color: var(--ink-dim);
+  color: var(--ink);
+  font-size: 1.05rem;
   max-width: 62ch;
 }
 
@@ -802,83 +803,81 @@ section {
   letter-spacing: 0.04em;
 }
 
-/* ─── Discography(Coming Soon placeholder grid) ───────── */
-.discog__lead {
-  color: var(--ink-dim);
-  max-width: 60ch;
-  margin-bottom: clamp(2rem, 5vw, 3rem);
-}
-
-.discog__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.discog__item {
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius);
-  border: 1px dashed var(--line-strong);
-  background: var(--gradient-soft);
+/* ─── Sound / Mix section(TOPの特集セクション) ─────────
+   Spotifyアルバム埋め込みとTuneCore Japanバッジを、PC幅では左右に、
+   モバイル幅(@media max-width:720pxの上書き参照)では縦に並べる。
+   両方とも外部サービスの埋め込みUI/バナー画像をそのまま使うため、
+   ラッパー側は余白・幅・角丸だけを制御する。 */
+.sound__embeds {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 1rem;
-}
-
-.discog__item span {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-/* ─── Sound / Mix section(TOPの特集セクション) ───────── */
-.sound__card {
-  display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: clamp(1.75rem, 5vw, 2.75rem);
+  justify-content: center;
+  gap: 2rem;
+}
+
+.sound__embed {
+  width: 100%;
+  max-width: 300px;
+}
+
+.sound__embed iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 300 / 600;
+  border: none;
   border-radius: 24px;
-  background: var(--gradient);
-  color: var(--accent-ink);
 }
 
-.sound__card-text h3 {
-  font-family: var(--font-display);
-  font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-  font-weight: 800;
-  margin-bottom: 0.5rem;
+.sound__embed--wide {
+  flex: 1 1 320px;
+  max-width: 460px;
 }
 
-.sound__card-text p {
-  opacity: 0.9;
-  font-size: 0.92rem;
-  max-width: 46ch;
+.sound__embed--wide iframe {
+  aspect-ratio: auto;
+  height: 352px;
 }
 
-.sound__card-link {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 999px;
-  padding: 0.8rem 1.6rem;
-  font-size: 0.75rem;
+/* TuneCore Japanバッジ → linkco.reのリリースページへのリンクボタン。
+   画像自体は加工せず、角丸+ホバー時の浮き上がりのみCSSで付与する。
+   直下に「ALL Release Links」ラベルを添える。 */
+.sound__badge-wrap {
+  flex: 1 1 320px;
+  max-width: 460px;
+}
+
+.sound__badge {
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.sound__badge img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sound__badge:hover,
+.sound__badge:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+.sound__badge-label {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: background 0.2s ease;
+  color: var(--ink-dim);
 }
-
-.sound__card-link:hover { background: rgba(255, 255, 255, 0.28); }
 
 /* ─── SNS Links ─────────────────────── */
 .social {
@@ -919,6 +918,24 @@ section {
   border-color: var(--accent);
   color: var(--accent);
   transform: translateY(-2px);
+}
+
+/* サービスロゴ(モノラインSVG。/dj/nao/profile/と同じアイコンセット)。 */
+.social__index-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.social__index-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .social__index-arrow {
@@ -1058,6 +1075,15 @@ section {
 
 /* ─── Responsive(375〜430pxを主対象) ────── */
 @media (max-width: 720px) {
+  .sound__embeds { flex-direction: column; }
+
+  .sound__embed--wide,
+  .sound__badge-wrap {
+    flex: none;
+    width: 100%;
+    max-width: 480px;
+  }
+
   .site-nav {
     position: fixed;
     inset: 68px 1rem auto auto;
@@ -1101,8 +1127,6 @@ section {
   .schedule__date { flex-direction: row; align-items: baseline; gap: 0.5rem; }
 
   .schedule__aside { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
-
-  .sound__card { flex-direction: column; align-items: flex-start; text-align: left; }
 }
 
 :focus-visible {

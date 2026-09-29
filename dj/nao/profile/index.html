@@ -9,7 +9,7 @@
 
   <!--
     【重要】このページ(/dj/nao/profile/)は本格デザイン制作の第1弾として、
-    /dj/nao/style.css・/dj/nao/script.js(TOP/NEWS/SCHEDULE/DISCOGRAPHYが
+    /dj/nao/style.css・/dj/nao/script.js(TOP/NEWS/SCHEDULEが
     使うプロトタイプ用の共通ファイル)から完全に独立させた。
     style.css / script.js はこのディレクトリ専用(他ページに影響しない)。
 
@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap" rel="stylesheet">
   <!-- ?v=YYYYMMDD-N: キャッシュバスター(TOP/dj/nao/index.htmlと同じ方針)。 -->
-  <link rel="stylesheet" href="style.css?v=20260929-5">
+  <link rel="stylesheet" href="style.css?v=20260930-1">
 
   <script src="/dj/shared/js/utils.js"></script>
   <script src="/dj/shared/js/api-client.js"></script>
@@ -54,7 +54,6 @@
         <a href="/dj/nao/news/">NEWS</a>
         <a href="/dj/nao/schedule/">SCHEDULE</a>
         <a href="/dj/nao/profile/" aria-current="page">PROFILE</a>
-        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
       </nav>
 
       <!--
@@ -88,9 +87,11 @@
       <div class="profBox__photo" data-dj-photo aria-hidden="true"><span>PHOTO</span></div>
       <h2 class="profBox__name" id="profile-name" data-dj-name>NAO</h2>
       <div class="profBox__bio">
-        <!-- TODO(CSPJ): 正式なプロフィール文章(活動歴・得意ジャンル・出演実績など)が
-             届き次第、下記のプレースホルダーを差し替える -->
-        <p>プロフィール情報を準備中です。活動歴・得意ジャンル・出演実績などは、内容が確定次第こちらに掲載します。</p>
+        <p>6月7日生まれ。横浜出身、東京在住のDJ,<br>元housenation､TRANCERAVEのDJ</p>
+        <p>2003年、幼少時代から続けていたピアノによって取得した「音楽性」と「感性」を武器に地元横浜でDJデビューを果たす。</p>
+        <p>そのPLAY STYLEは、EPIC TRANCEを中心に「聞かせて盛り上げる」だけでは無く、得意のパフォーマンス、持ち前の音楽センスで「見せる」「感じさせる」といった独自のPLAT STYLEを確立し、オーディエンスに感動と興奮を与えていく。その飛躍が買われ、DJデビューわずか1年でTRANCE RAVEへの所属が決定。</p>
+        <p>2004年より渋谷ATOMで開催されている「TRANCE RAVE,RAINBOW etc・・・」 に出演し経験とキャリアを積むと同時に、トランス界に旋風を巻き起こす。</p>
+        <p>そして、そのepic業界を経て、2008年、更なる飛躍を遂げるべく、本格的にDJ STYLEをアドオンし、HOUSEmusic,を勉強し、レギュラーイベントはhousenationとWOMB第一土曜LAX、渋谷キャメロットでのLOVEBEATとTRANCERAVE、ELF(リバイバル)と言うビックイベントではレギュラーDJとして参加していました。。その他六本木pladisTOKYOやFORAMや、西麻布アストランス、その他パーティーでは、宇宙戦艦ヤマトがてがけた船(卑弥呼)での船上パーティーなどにも参加し、ゲストDJとしては各地でも活躍し、今後も「四つ打ち」を極めるかの如く、ハウスを中心にオールジャンルのイベントへの参戦も決定されており、「四ッ打ちマニア」からは目の離せない存在になる新生であることは間違いないであろう。♪♪♪♪♪♪♪♪♪♪♪♪</p>
       </div>
       <!--
         SNS LINKS — 公開API接続(GET https://api.cs-pj.com/v1/djs/nao/social-links)。
@@ -134,12 +135,11 @@
         <a href="/dj/nao/news/">NEWS</a>
         <a href="/dj/nao/schedule/">SCHEDULE</a>
         <a href="/dj/nao/profile/">PROFILE</a>
-        <a href="/dj/nao/discography/">DISCOGRAPHY</a>
       </nav>
       <p><span data-dj-name>NAO</span> Official Site — Produced by <a class="site-footer__credit-link" href="https://cs-pj.com/">Connect Spread PJ (CSPJ)</a></p>
     </div>
   </footer>
 
-  <script src="script.js?v=20260929-5"></script>
+  <script src="script.js?v=20260930-1"></script>
 </body>
 </html>

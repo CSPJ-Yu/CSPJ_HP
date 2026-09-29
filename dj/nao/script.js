@@ -2,7 +2,7 @@
  * DJ NAO — /dj/nao/script.js
  * 完全に独立したスクリプトです。CSPJ本体・DJポータル・他のDJページの
  * JSとは無関係に動作します。/dj/nao/ 配下の全ページ(TOP・NEWS・SCHEDULE・
- * PROFILE・DISCOGRAPHY)から共通で読み込まれ、各init関数はそのページに
+ * PROFILE)から共通で読み込まれ、各init関数はそのページに
  * 該当する要素が存在する場合だけ動作する(存在しなければ何もしない)。
  */
 'use strict';
@@ -366,6 +366,17 @@ const DJ_SLUG = 'nao';
     threads: 'Threads',
   };
 
+  // 簡易モノラインアイコン(独自制作。各ブランドの公式ロゴ画像は使用していない。
+  // PROFILEページ(/dj/nao/profile/script.js)と同じセットを使い、見た目を揃えている)。
+  const ICONS = {
+    instagram: '<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/>',
+    x: '<path d="M4.5 4.5L19.5 19.5M19.5 4.5L4.5 19.5"/>',
+    tiktok: '<path d="M14 4v9.5a3.2 3.2 0 1 1-3.2-3.2c.3 0 .6 0 .9.1"/><path d="M14 4c.3 2 1.9 3.5 4 3.7"/>',
+    youtube: '<rect x="3" y="6.5" width="18" height="11" rx="3.5"/><path d="M10.5 9.5l4 2.5-4 2.5z" fill="currentColor" stroke="none"/>',
+    facebook: '<circle cx="12" cy="12" r="8.5"/><path d="M13.2 20v-6.3h2l.3-2.4h-2.3V9.7c0-.7.2-1.2 1.2-1.2h1.3V6.3c-.2 0-1.1-.1-2.1-.1-2.1 0-3.5 1.3-3.5 3.6v2h-2.4v2.7h2.4V21z" fill="currentColor" stroke="none"/>',
+    threads: '<path d="M8 8.5c1-.7 2.2-1 3.6-1 3 0 5 1.8 5 5.2 0 3.7-2.4 5.8-5.6 5.8-2.6 0-4.5-1.3-4.5-3.4 0-2 2-3 4.6-3 .9 0 1.8.1 2.5.4"/>',
+  };
+
   CSPJSocialData.fetchSocialLinks(DJ_SLUG)
     .then((links) => {
       if (!links.length) return; // 0件なら静的プレースホルダー(Coming Soon)を維持
@@ -389,13 +400,17 @@ const DJ_SLUG = 'nao';
   function renderSocialItem(link) {
     const { escapeHtml } = CSPJUtils;
     const displayLabel = link.label || SERVICE_LABELS[link.service] || link.service;
+    const iconPath = ICONS[link.service];
+    const iconHtml = iconPath
+      ? `<span class="social__index-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${iconPath}</svg></span>`
+      : '';
 
     const a = document.createElement('a');
     a.className = 'social__index-item';
     a.href = link.url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
-    a.innerHTML = `${escapeHtml(displayLabel)}<span class="social__index-arrow" aria-hidden="true">↗</span>`;
+    a.innerHTML = `${iconHtml}${escapeHtml(displayLabel)}<span class="social__index-arrow" aria-hidden="true">↗</span>`;
 
     return a;
   }

@@ -3,7 +3,7 @@
    /dj/nao/profile/style.css
 
    このファイルは /dj/nao/profile/ 専用です。/dj/nao/style.css
-   (TOP/NEWS/SCHEDULE/DISCOGRAPHYが使う共通スタイル)には一切依存せず、
+   (TOP/NEWS/SCHEDULEが使う共通スタイル)には一切依存せず、
    このファイルの変更が他ページに影響することはありません
    (CSPJ Proプラン方針: 見た目はページ単位で完全個別 / データ取得層のみ共通)。
 
@@ -49,7 +49,7 @@
   --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans',
                   'Noto Sans JP', sans-serif;
 
-  /* TOP/NEWS/SCHEDULE/DISCOGRAPHY(共有style.css)と数値を揃えた
+  /* TOP/NEWS/SCHEDULE(共有style.css)と数値を揃えた
      (以前は1160px/5vw-2.5remで、コンテナ幅・左右余白がわずかに異なり、
      ヘッダーのナビ位置がページごとに数十px単位でズレていた)。 */
   --max: 1080px;
@@ -61,7 +61,7 @@
    ビューポート幅が変わり、右寄せのヘッダーナビの位置がページ間で
    数px〜十数pxズレて見える(Windows等、非オーバーレイ型スクロールバー環境)。
    常にスクロールバー分の余白を確保することで、全ページで位置を固定する
-   (TOP/NEWS/SCHEDULE/DISCOGRAPHYと同じ対応)。 */
+   (TOP/NEWS/SCHEDULEと同じ対応)。 */
 html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
@@ -104,7 +104,7 @@ ul { list-style: none; }
 .skip-link:focus { top: 0; }
 
 /* ─── Header ─────────────────────────────────── */
-/* TOP/NEWS/SCHEDULE/DISCOGRAPHY(共有style.css)と高さ・余白の取り方を
+/* TOP/NEWS/SCHEDULE(共有style.css)と高さ・余白の取り方を
    揃えるため、固定heightではなくpaddingで高さが決まる方式に統一した
    (2026-09)。メニュー(.site-nav)側も含め、モバイル表示の寸法・余白・
    影を共有style.cssと同じ値に揃えている。 */
@@ -481,7 +481,7 @@ ul { list-style: none; }
 
 /* ─── Responsive ─────────────────────────────── */
 @media (max-width: 720px) {
-  /* TOP/NEWS/SCHEDULE/DISCOGRAPHY(共有style.css)と同じ寸法・余白に統一。 */
+  /* TOP/NEWS/SCHEDULE(共有style.css)と同じ寸法・余白に統一。 */
   .site-nav {
     position: fixed;
     inset: 68px 1rem auto auto;
