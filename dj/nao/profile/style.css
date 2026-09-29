@@ -1,0 +1,525 @@
+/* =============================================
+   DJ NAO — PROFILE page stylesheet (専用・独立)
+   /dj/nao/profile/style.css
+
+   このファイルは /dj/nao/profile/ 専用です。/dj/nao/style.css
+   (TOP/NEWS/SCHEDULEが使う共通スタイル)には一切依存せず、
+   このファイルの変更が他ページに影響することはありません
+   (CSPJ Proプラン方針: 見た目はページ単位で完全個別 / データ取得層のみ共通)。
+
+   レイアウト参照元: https://avex.jp/djkoo/profile/ の実装をブラウザで検証し、
+   DOM構造・寸法・配色をComputed Styleレベルで確認した上で、構造を忠実に
+   再現しつつテーマカラーをdeeppinkに置き換えて新規に書き起こしたもの
+   (元サイトのCSS/画像/アセットはコピーしていない)。
+
+   確認済みの元サイト仕様(2026-09、ブラウザでの実測値):
+   - ヘッダー: 高さ110px、半透明白(alpha 0.7)、ロゴ左/ナビ中央/CONTACTピル右
+   - ページ全体に巨大な回転パネル(約-23°、単色)を敷いた対角線2トーン背景
+   - h1.pageTtl: 44px/bold/中央揃え、直下に45×2pxのアクセントバー(::after)
+   - "profBox"という再利用コンポーネント(写真[3:4程度]→名前見出し→本文→
+     SNSアイコン4つ[flex, gap 24px])を縦積みし、これを複数回使う設計
+   ============================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* 2026-09: TOP(/dj/nao/)に合わせてページ全体を黒背景へ統一した。
+     deeppinkのアクセント自体は変更していない。 */
+  --accent:       #ff1493; /* deeppink(メイン) */
+  --accent-dark:  #d6127c;
+  /* 対角線バナー等で使う2色は、色相を変えたグラデーション風の配色にはせず、
+     同じdeeppinkを異なる不透明度で重ねた「濃淡2色」にしている(黒背景上で
+     半透明のdeeppinkとして見える。白背景時代の#ffe0ee/#ff9dc9から変更)。 */
+  --accent-soft:  rgba(255, 20, 147, 0.14); /* deeppinkの淡色(低彩度側) */
+  --accent-soft-2: rgba(255, 20, 147, 0.32); /* deeppinkの濃色(高彩度側) */
+  --ink:          #ffffff;
+  --ink-dim:      #b3b3b3;
+  --ink-faint:    #808080;
+  --bg:           #000000;
+  --surface:      #111114;
+  --line:         #262626;
+  --line-strong:  #3a3a3a;
+
+  --font-display: 'Heebo', -apple-system, BlinkMacSystemFont, 'Hiragino Sans',
+                  'Noto Sans JP', sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans',
+                  'Noto Sans JP', sans-serif;
+
+  /* TOP/NEWS/SCHEDULE(共有style.css)と数値を揃えた
+     (以前は1160px/5vw-2.5remで、コンテナ幅・左右余白がわずかに異なり、
+     ヘッダーのナビ位置がページごとに数十px単位でズレていた)。 */
+  --max: 1080px;
+  --pad: clamp(1.25rem, 6vw, 3rem);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ページごとに中身の縦の長さが違うと、縦スクロールバーの有無で実質的な
+   ビューポート幅が変わり、右寄せのヘッダーナビの位置がページ間で
+   数px〜十数pxズレて見える(Windows等、非オーバーレイ型スクロールバー環境)。
+   常にスクロールバー分の余白を確保することで、全ページで位置を固定する
+   (TOP/NEWS/SCHEDULEと同じ対応)。 */
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+}
+
+/* ─── Skip link ──────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 0;
+  z-index: 400;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 0 0 8px 0;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus { top: 0; }
+
+/* ─── Header ─────────────────────────────────── */
+/* TOP/NEWS/SCHEDULE(共有style.css)と高さ・余白の取り方を
+   揃えるため、固定heightではなくpaddingで高さが決まる方式に統一した
+   (2026-09)。メニュー(.site-nav)側も含め、モバイル表示の寸法・余白・
+   影を共有style.cssと同じ値に揃えている。 */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  /* TOP(/dj/nao/)のヘッダーと同じ黒基調の半透明ガラス背景。
+     2026-09にページ全体を黒背景へ統一したため、--lineも含めて
+     通常通り変数だけで成立する(ヘッダー専用の個別上書きは撤去済み)。 */
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header__inner {
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 1rem var(--pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* TOP(/dj/nao/)と同じロゴ画像・同じ表示サイズ(images/logo-nao-deeppink.png)。 */
+.brand__logo {
+  height: 26px;
+  width: auto;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.site-nav a {
+  position: relative;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  padding-bottom: 3px;
+  transition: color 0.2s ease;
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--ease);
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.site-nav a:hover::after,
+.site-nav a:focus-visible::after,
+.site-nav a[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+/* [hidden]属性が確実に効くよう、.header-cta / .profBoxの明示的なdisplay指定より
+   詳細度を上げて上書きする(将来hidden属性を外すだけで即座に有効化できるようにする)。 */
+.header-cta[hidden],
+.profBox[hidden] {
+  display: none;
+}
+
+.header-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(255, 20, 147, 0.28);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.header-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 20, 147, 0.36);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.nav-toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.is-open span:nth-child(2) { opacity: 0; }
+.nav-toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ─── Page banner(対角線2トーン背景 + PROFILE見出し) ─────── */
+.page-banner {
+  position: relative;
+  padding: clamp(3rem, 9vw, 5.5rem) var(--pad) clamp(2.5rem, 7vw, 4rem);
+  text-align: center;
+  overflow: hidden;
+}
+
+/* 元サイトの「巨大な回転パネルによる対角線2トーン背景」を、CSSのみで
+   レスポンシブに再現したもの(JSでサイズ計算する実装は採用していない)。
+   純色の帯を左上から斜めに配置し、pointer-events:noneでクリックを妨げない。 */
+.page-banner__diagonal {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--accent-soft);
+  clip-path: polygon(0 0, 68% 0, 32% 100%, 0 100%);
+}
+
+.page-banner__diagonal--2 {
+  background: var(--accent-soft-2);
+  clip-path: polygon(0 0, 40% 0, 14% 100%, 0 100%);
+}
+
+.page-banner__eyebrow {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.page-banner__title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.page-banner__title::after {
+  content: '';
+  display: block;
+  width: 52px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  margin: 1.1rem auto 0;
+}
+
+/* ─── profBox(写真+名前+本文+SNS の縦積みコンポーネント) ───── */
+.profBox {
+  max-width: 640px;
+  margin: 0 auto clamp(4rem, 10vw, 7rem);
+  padding: 0 var(--pad);
+  position: relative;
+  z-index: 1;
+}
+
+.profBox:last-of-type { margin-bottom: 0; }
+
+.profBox__photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  /* object-fit: containで生まれる余白を、写真の背景として馴染むよう
+     白に変更(枠線も削除。TOPの.profile__photoと同じ対応)。 */
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+  overflow: hidden;
+  box-shadow: 0 24px 50px rgba(255, 20, 147, 0.18);
+}
+
+.profBox__photo img {
+  width: 100%;
+  height: 100%;
+  /* coverだと顔や身体が枠からはみ出て見切れてしまうため、containで
+     写真全体が縮小されて収まるようにする。 */
+  object-fit: contain;
+}
+
+.profBox__photo span {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.profBox__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: -0.005em;
+  margin-bottom: 1rem;
+}
+
+.profBox__bio {
+  color: var(--ink-dim);
+  font-size: 0.92rem;
+  line-height: 1.85;
+}
+
+.profBox__bio p + p { margin-top: 1rem; }
+
+/* ─── SNSアイコン(円形・線画アイコン。ブランドロゴ画像は使用せず、
+   モノラインの独自SVGアイコンで表現。script.jsが描画する)─────── */
+.profBox__sns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+}
+
+.profBox__sns-placeholder {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-top: 1.75rem;
+}
+
+.sns-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.sns-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sns-icon:hover,
+.sns-icon:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-3px);
+}
+
+/* ─── 将来ブロック用プレースホルダー(元サイトのUKOON相当の位置に、
+   NAO向けの内容が確定するまでの「予約枠」として用意) ─────── */
+.profBox--reserved .profBox__photo {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--accent-soft) 0px, var(--accent-soft) 14px,
+    var(--surface) 14px, var(--surface) 28px
+  );
+}
+
+.profBox--reserved .profBox__name {
+  color: var(--ink-faint);
+}
+
+.profBox--reserved .profBox__bio {
+  color: var(--ink-faint);
+}
+
+/* ─── Footer ─────────────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: clamp(2.5rem, 6vw, 3.5rem) var(--pad) 2.5rem;
+  background: var(--accent-soft);
+}
+
+.site-footer__inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.site-footer__nav a {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.site-footer__nav a:hover { color: var(--accent); }
+
+.site-footer p {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+}
+
+.site-footer a.site-footer__credit-link { color: var(--accent); font-weight: 700; }
+
+/* ─── Reveal(スクロールでのフェードイン) ─────── */
+.reveal-ready {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Responsive ─────────────────────────────── */
+@media (max-width: 720px) {
+  /* TOP/NEWS/SCHEDULE(共有style.css)と同じ寸法・余白に統一。 */
+  .site-nav {
+    position: fixed;
+    inset: 68px 1rem auto auto;
+    width: min(260px, 80vw);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+    gap: 0.5rem;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+  }
+
+  .site-nav.is-open { transform: translateX(0); }
+
+  .site-nav a { padding: 0.75rem 0.5rem; }
+
+  .nav-toggle { display: flex; }
+
+  .header-cta span.header-cta__label--full { display: none; }
+
+  .page-banner__diagonal { clip-path: polygon(0 0, 90% 0, 55% 100%, 0 100%); }
+  .page-banner__diagonal--2 { clip-path: polygon(0 0, 60% 0, 25% 100%, 0 100%); }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

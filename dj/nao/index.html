@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    公開ポータル(/dj/shared/js/dj-roster.js)からリンクされる準備段階のページのため、
+    実データ・実素材(プロフィール文・写真・SNSリンク等)が揃うまでの間、
+    検索エンジンには一旦インデックスさせない。本番公開が確定したら削除すること。
+  -->
+  <meta name="robots" content="noindex">
+  <meta name="description" content="DJ NAO 公式サイト(Connect Spread PJ制作)。準備中のセクションがあります。">
+  <title>DJ NAO — Connect Spread PJ</title>
+
+  <!--
+    このページ以下 /dj/nao/ は完全に独立したサイトです。CSPJ本体の
+    /css/style.css /js/main.js、DJポータルの /portal/dj/style.css、
+    および他のDJページ(/dj/yu-x/ 等)のCSS/JSは一切読み込みません。
+
+    レイアウト構成はavex.jp/djkoo/(TOP/NEWS/SCHEDULE/PROFILEの
+    独立ページ構成 + ヘッダーナビ + Hero + Profile + News/Scheduleティザー +
+    特集 + SNS + Footer)を参考にしているが、配色・タイポグラフィ・実装は
+    完全新規(CSPJ本体・既存DJサイトのCSS/JSはコピーしていない)。
+    配色はCSPJの既存DJサイト(モノクロダーク)とは意図的に差別化した、
+    白背景 + deeppinkアクセント(2026-09に単色へ統一済み)。
+    見出し用の太字書体としてSoraのみ追加(欧文表示のみに使用。日本語文は
+    OS標準フォントにフォールバックする)。
+
+    ロゴ画像(images/logo-nao-deeppink.png)は、支給された黒地のロゴ
+    データ(images/image-1788842594446.png)の黒(RGB 0,0,0)をdeeppink
+    (#ff1493)へアルファチャンネルを保持したまま変換し、透過余白を
+    トリミングしたもの(Pillowでのピクセル単位変換。デザイン自体の改変は
+    行っていない)。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- ?v=YYYYMMDD-N: キャッシュバスター(/portal/dj/index.html等、既存CSPJページと
+       同じ運用方針)。style.css/script.jsを更新した際は、この値を当日の日付に
+       更新すること(ブラウザキャッシュにより反映が遅れる問題への対応)。 -->
+  <link rel="stylesheet" href="style.css?v=20260930-10">
+
+  <!--
+    CSPJ共通のデータ取得モジュール(データ取得のみ・HTML/CSSは含まない)。
+    読み込み順に注意: utils.js → api-client.js → (各データモジュール、順不同)
+    詳細は /dj/README.md を参照。DJ NAOはslug 'nao' で運用する
+    (cspj-manage側にDJ登録・SNSリンク・スケジュール用シート連携が済み次第、
+    このページのプレースホルダー表示は自動的に実データへ置き換わる)。
+  -->
+  <script src="/dj/shared/js/utils.js"></script>
+  <script src="/dj/shared/js/api-client.js"></script>
+  <script src="/dj/shared/js/profile-data.js"></script>
+  <script src="/dj/shared/js/schedule-data.js"></script>
+  <script src="/dj/shared/js/news-data.js"></script>
+  <script src="/dj/shared/js/social-data.js"></script>
+  <script src="/dj/shared/js/popup-data.js"></script>
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <!-- ページ最上部へのアンカー先。sticky headerがtop:0にいる間もgetBoundingClientRect().top
+       が0にならない、高さ0の専用要素(yu-xと同じ対策)。 -->
+  <div id="top" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <!-- data-dj-logo: ロゴ画像(黒地の元データをdeeppinkへ変換して使用)。
+           profile.display_nameが取得できた場合、script.jsがalt属性/aria-labelを
+           更新する(画像そのものは差し替えない)。 -->
+      <a href="#top" class="brand" aria-label="NAO">
+        <img src="images/logo-nao-deeppink.png" alt="NAO" class="brand__logo" data-dj-logo>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="/dj/nao/" aria-current="page">TOP</a>
+        <a href="/dj/nao/news/">NEWS</a>
+        <a href="/dj/nao/schedule/">SCHEDULE</a>
+        <a href="/dj/nao/profile/">PROFILE</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="hero">
+      <div class="hero__grid" aria-hidden="true"></div>
+      <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
+      <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
+
+      <!-- 将来アーティスト写真を追加する場合: ここに
+           <div class="hero__portrait"><img src="..." alt=""></div> を追加できる。
+           写真が無い現状は、グラデーションのグラフィックだけで成立するレイアウト。 -->
+
+      <div class="hero__inner">
+        <h1 class="hero__title">
+          <img src="images/logo-nao-deeppink.png" alt="NAO" class="hero__logo" data-dj-logo>
+        </h1>
+        <a href="#profile" class="hero__cta">Scroll ↓</a>
+      </div>
+    </section>
+
+    <section id="profile" aria-labelledby="profile-heading">
+      <div class="wrap">
+        <h2 class="section-title" id="profile-heading">
+          <span aria-hidden="true">01</span>Profile
+        </h2>
+        <!--
+          PROFILE: 公開API接続済み(GET https://api.cs-pj.com/v1/djs/nao)。
+          データ取得は /dj/shared/js/profile-data.js (CSPJProfile.fetchProfile)が担当し、
+          このページ固有の描画([data-dj-name] / [data-dj-photo] への反映)は
+          script.js の initProfile() が担当する。
+
+          【API側の制約】cspj-manage側のdjsテーブルには slug/display_name/status/
+          portal_card_image_url しかカラムが存在せず、公開APIもこれらしか返さない。
+          Bio・Genre・locationはAPI側にデータ自体が存在しないため、これらは
+          動的化していない(推測して追加していない)。
+        -->
+        <div class="profile__grid">
+          <!-- data-dj-photo: portal_card_image_url が取得できた場合のみJSが<img>を差し込む枠。
+               取得できない間はこのプレースホルダー表示のまま。 -->
+          <div class="profile__photo" data-dj-photo aria-hidden="true"><span>PHOTO</span></div>
+          <div class="profile__text">
+            <p>2003年、幼少時代から続けていたピアノによって取得した「音楽性」と「感性」を武器に地元横浜でDJデビューを果たす。</p>
+            <p>そのPLAY STYLEは、EPIC TRANCEを中心に「聞かせて盛り上げる」だけでは無く、得意のパフォーマンス、持ち前の音楽センスで「見せる」「感じさせる」といった独自のPLAT STYLEを確立し、オーディエンスに感動と興奮を与えていく。</p>
+            <a href="/dj/nao/profile/" class="hero__cta profile__cta">Profileを見る ↓</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="news" aria-labelledby="news-heading">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 class="section-title" id="news-heading">
+            <span aria-hidden="true">02</span>News
+          </h2>
+          <a href="/dj/nao/news/" class="section-more">一覧を見る <span aria-hidden="true">→</span></a>
+        </div>
+        <!--
+          NEWS一覧(ティザー) — 公開API接続済み(GET https://api.cs-pj.com/v1/djs/nao/news)。
+          data-news-limit="3": TOPページでは最新3件のみ表示(全件はNEWSページで表示)。
+          0件・取得失敗時は、この静的なCome Soonプレースホルダーをそのまま維持する。
+        -->
+        <div class="news__list" data-news-list data-news-limit="3">
+          <p class="news__placeholder">Coming Soon</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="schedule" aria-labelledby="schedule-heading">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 class="section-title" id="schedule-heading">
+            <span aria-hidden="true">03</span>Schedule
+          </h2>
+          <a href="/dj/nao/schedule/" class="section-more">一覧を見る <span aria-hidden="true">→</span></a>
+        </div>
+        <!--
+          data-schedule-limit="5": TOPページでは直近5件のみ表示(全件はSCHEDULEページで表示)。
+          初期表示は静的なプレースホルダー。JSでAPI取得に成功した場合のみ
+          .schedule__list の中身を実データで置き換える。
+        -->
+        <ul class="schedule__list" data-schedule-limit="5">
+          <li class="schedule__placeholder">現在、出演予定情報を準備中です。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="sound" aria-labelledby="sound-heading">
+      <div class="wrap">
+        <h2 class="section-title section-title--plain" id="sound-heading">
+          <span aria-hidden="true">04</span>Sound
+        </h2>
+        <div class="sound__embeds">
+          <!-- Spotifyアルバム埋め込み。 -->
+          <div class="sound__embed sound__embed--wide">
+            <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/3SfW6kHKRqxbBgBkTWEAjl?utm_source=generator&amp;si=b3dfa0211c8e48d9" width="100%" height="352" frameborder="0" allowfullscreen title="DJ NAO — Spotify Album" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          </div>
+          <!-- TuneCore Japan バッジ → linkco.reのリリースページへのリンクボタン。 -->
+          <div class="sound__badge-wrap">
+            <a href="https://linkco.re/EVVZPzUf" class="sound__badge" target="_blank" rel="noopener noreferrer">
+              <img src="images/tunecore-japan-badge.png" alt="TuneCore Japan">
+            </a>
+            <p class="sound__badge-label">ALL Release Links Is Here</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!--
+    SNS LINKS — 公開API接続済み(GET https://api.cs-pj.com/v1/djs/nao/social-links)。
+    データ取得・正規化は /dj/shared/js/social-data.js が、描画は script.js の
+    initSocialLinks() が担当する。0件・取得失敗時は静的なCome Soonプレースホルダーを維持する。
+  -->
+  <section id="social" class="social" aria-labelledby="social-heading">
+    <div class="wrap">
+      <h2 class="section-title section-title--plain" id="social-heading">SNS</h2>
+      <div class="social__list" data-social-list>
+        <p class="social__placeholder">Coming Soon</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+        <a href="/dj/nao/">TOP</a>
+        <a href="/dj/nao/news/">NEWS</a>
+        <a href="/dj/nao/schedule/">SCHEDULE</a>
+        <a href="/dj/nao/profile/">PROFILE</a>
+      </nav>
+      <p><span data-dj-name>NAO</span> Official Site — Produced by <a class="site-footer__credit-link" href="https://cs-pj.com/">Connect Spread PJ (CSPJ)</a></p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=20260930-10"></script>
+</body>
+</html>
